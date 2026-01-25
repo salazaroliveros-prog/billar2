@@ -7,9 +7,10 @@
   "scripts": {
     "test": "node test/test.js",
     "test:puppeteer": "node test/puppeteer.test.js"
+    ,"test:puppeteer:handlers": "node test/puppeteer.handlers.test.js"
   },
   "dependencies": {
     "jsdom": "^21.1.0",
-    "puppeteer": "^20.11.0"
+    "puppeteer": "^19.11.1"
   }
 }

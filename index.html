@@ -24,7 +24,7 @@
             --dark-color: #2c3e50;
             --gray-color: #95a5a6;
         }
-        
+
         * {
             margin: 0;
             padding: 0;
@@ -695,6 +695,20 @@
             
             <div class="table-container">
                 <h3 class="mb-20">Registro de Mesas</h3>
+                <div class="form-row" style="margin-bottom:10px; align-items:center;">
+                    <div class="form-group" style="min-width:160px;">
+                        <label for="registro-from">Desde</label>
+                        <input type="date" id="registro-from">
+                    </div>
+                    <div class="form-group" style="min-width:160px;">
+                        <label for="registro-to">Hasta</label>
+                        <input type="date" id="registro-to">
+                    </div>
+                    <div style="margin-left:auto; display:flex; gap:10px; align-items:flex-end;">
+                        <button class="btn btn-primary" id="filtrar-registro">Filtrar</button>
+                        <button class="btn btn-success" id="export-registro-csv">Exportar CSV</button>
+                    </div>
+                </div>
                 <table>
                     <thead>
                         <tr>
@@ -777,6 +791,7 @@
                     <div class="form-group">
                         <label for="producto-nombre">Nombre del Producto</label>
                         <input type="text" id="producto-nombre" placeholder="Ej. Producto">
+                        <input type="hidden" id="producto-id" value="">
                     </div>
                     <div class="form-group">
                         <label for="categoria">Categoría</label>
@@ -899,6 +914,56 @@
                 </div>
                 <div class="d-flex justify-end">
                     <button class="btn btn-primary" id="calcular-proyeccion"><i class="fas fa-calculator"></i> Calcular Proyección</button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <h3 class="mb-20">Ingresos por Mesas (por Día)</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Total Mesas (Q.)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="mesas-por-dia-body">
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="form-container">
+                <h3 class="mb-20">Backup y Sincronización</h3>
+                <p>Puede mantener los datos localmente y opcionalmente subirlos a GitHub (Gist) o sincronizarlos con Google Sheets.
+                Para GitHub use un Personal Access Token con permiso <strong>gist</strong>. Para Google Sheets proporcione un Access Token con scope <code>https://www.googleapis.com/auth/spreadsheets</code>.</p>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="github-token">GitHub Token (personal)</label>
+                        <input type="password" id="github-token" placeholder="ghp_xxx...">
+                    </div>
+                    <div class="form-group">
+                        <label for="github-filename">Nombre de archivo (Gist)</label>
+                        <input type="text" id="github-filename" value="backup_finanzas.json">
+                    </div>
+                </div>
+                <div class="d-flex justify-end">
+                    <button class="btn btn-primary" id="upload-github"><i class="fab fa-github"></i> Subir a GitHub (Gist)</button>
+                </div>
+
+                <hr style="margin:12px 0">
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="gcloud-token">Google Sheets Access Token</label>
+                        <input type="password" id="gcloud-token" placeholder="ya29.a0Af...">
+                    </div>
+                    <div class="form-group">
+                        <label for="gcloud-sheetid">Google Sheet ID</label>
+                        <input type="text" id="gcloud-sheetid" placeholder="Sheet ID (ej: 1A2b3C...)">
+                    </div>
+                </div>
+                <div class="d-flex justify-end">
+                    <button class="btn btn-success" id="sync-gsheet"><i class="fas fa-cloud-upload-alt"></i> Sincronizar Google Sheets</button>
                 </div>
             </div>
             
@@ -1443,6 +1508,7 @@
         let productos = [];
         let ventas = [];
         let inventario = [];
+        let registroMesas = [];
         
         // Inicializar la aplicación
         document.addEventListener('DOMContentLoaded', function() {
@@ -1466,32 +1532,55 @@
             
             // Cargar datos en las tablas
             cargarMesasActivas();
+            cargarRegistroMesas();
+            // Refrescar la vista de mesas para actualizar temporizadores en vivo
+            if (!window.mesasRefreshInterval) window.mesasRefreshInterval = setInterval(cargarMesasActivas, 1000);
             cargarInventario();
             cargarProductosSelect();
             
             // Inicializar gráficos
             inicializarGraficos();
+            // cargar registroMesas y resumen por día
+            cargarRegistroMesas();
+            cargarResumenMesasPorDia();
+        });
+
+        // Bind buttons for registro filters/export
+        document.addEventListener('DOMContentLoaded', function(){
+            const filBtn = document.getElementById('filtrar-registro');
+            if (filBtn) filBtn.addEventListener('click', function(e){ e.preventDefault(); cargarRegistroMesas(); cargarResumenMesasPorDia(); });
+            const expBtn = document.getElementById('export-registro-csv');
+            if (expBtn) expBtn.addEventListener('click', function(e){ e.preventDefault(); exportRegistroMesasCSV(); });
         });
         
         // Inicializar datos vacíos para despliegue (sin datos de prueba)
         function inicializarDatos() {
-            // Dejar estructuras en cero
-            mesasActivas = [];
-            productos = [];
-            ventas = [];
-
-            // Vaciar pendientes del módulo si existe
+            // Intentar cargar datos existentes desde localStorage
             try {
-                localStorage.setItem('pendientes', JSON.stringify([]));
-                if (window.pendientesModule && typeof window.pendientesModule.load === 'function') {
-                    window.pendientesModule.load();
-                    if (typeof window.pendientesModule.setup === 'function') window.pendientesModule.setup();
-                }
+                cargarDesdeLocalStorage();
             } catch (e) {
-                console.warn('No se pudo limpiar pendientes en localStorage:', e);
+                console.warn('Error cargando desde localStorage en inicializarDatos:', e);
             }
 
-            // Guardar estructuras vacías en localStorage para despliegue limpio
+            // Asegurar estructuras por si no existían en el almacenamiento
+            if (!Array.isArray(mesasActivas)) mesasActivas = [];
+            if (!Array.isArray(productos)) productos = [];
+            if (!Array.isArray(ventas)) ventas = [];
+
+            // Solo inicializar pendientes si no existe ya
+            try {
+                if (!localStorage.getItem('pendientes')) {
+                    localStorage.setItem('pendientes', JSON.stringify([]));
+                    if (window.pendientesModule && typeof window.pendientesModule.load === 'function') {
+                        window.pendientesModule.load();
+                        if (typeof window.pendientesModule.setup === 'function') window.pendientesModule.setup();
+                    }
+                }
+            } catch (e) {
+                console.warn('No se pudo asegurar pendientes en localStorage:', e);
+            }
+
+            // Guardar (o actualizar) estructuras en localStorage sin borrar datos previos
             guardarEnLocalStorage();
         }
         
@@ -1591,8 +1680,32 @@
                 
                 // Desactivar mesa
                 mesasActivas[mesaIndex].activa = false;
+
+                // Registrar entrada fija en registroMesas para consultas futuras
+                const fecha = new Date();
+                const tiempoHoras = tiempoTranscurrido; // en horas
+                const registro = {
+                    id: Date.now(),
+                    fecha: fecha,
+                    mesa: mesaActiva.mesa,
+                    jugadores: mesaActiva.jugadores || (mesaActiva.players ? mesaActiva.players.length : 0),
+                    tiempoHoras: tiempoHoras,
+                    tarifaPorJugador: mesaActiva.tarifa || 0,
+                    total: total,
+                    players: Array.isArray(mesaActiva.players) ? mesaActiva.players.map(p => ({ start: p.start })) : [],
+                    estado: 'finalizada'
+                };
+
+                registroMesas.push(registro);
+
+                // Además agregar a ventas como ingreso por mesa (para mantener fijo en finanzas)
+                ventas.push({ id: Date.now()+1, producto: `Mesa ${mesaActiva.mesa}`, cantidad: 1, precio: total, total: total, ganancia: total, hora: fecha, tipo: 'mesa' });
+
                 guardarEnLocalStorage();
                 cargarMesasActivas();
+                cargarRegistroMesas();
+                cargarInventario();
+                actualizarVentasHistorial();
             });
             
             // Botón para registrar venta
@@ -1695,6 +1808,36 @@
                 document.getElementById('precio-venta-inv').value = '';
                 document.getElementById('stock').value = '';
             });
+
+            // Botón para actualizar producto (edición)
+            document.getElementById('actualizar-producto').addEventListener('click', function() {
+                const id = parseInt(document.getElementById('producto-id').value);
+                if (!id) {
+                    alert('Ningún producto seleccionado para actualizar. Use "Editar" en un producto primero.');
+                    return;
+                }
+
+                const producto = productos.find(p => p.id === id);
+                if (!producto) {
+                    alert('Producto no encontrado.');
+                    return;
+                }
+
+                producto.nombre = document.getElementById('producto-nombre').value.trim();
+                producto.categoria = document.getElementById('categoria').value;
+                producto.costo = parseFloat(document.getElementById('costo-compra').value) || producto.costo;
+                producto.precio = parseFloat(document.getElementById('precio-venta-inv').value) || producto.precio;
+                producto.stock = parseInt(document.getElementById('stock').value) || producto.stock;
+                producto.stockMinimo = parseInt(document.getElementById('stock-minimo').value) || producto.stockMinimo;
+
+                guardarEnLocalStorage();
+                cargarInventario();
+                cargarProductosSelect();
+
+                alert(`Producto "${producto.nombre}" actualizado.`);
+                // limpiar
+                document.getElementById('producto-id').value = '';
+            });
             
             // Botón para sincronizar con la nube
             document.getElementById('sincronizar-nube').addEventListener('click', function() {
@@ -1716,6 +1859,123 @@
                         alert('Error en la sincronización. Verifique su conexión a Internet e intente nuevamente.');
                     }
                 }, 2000);
+            });
+
+            // Calcular proyección financiera
+            const proyeccionContainer = document.createElement('div');
+            proyeccionContainer.id = 'proyeccion-result';
+            proyeccionContainer.style.marginTop = '10px';
+            const calculoBtn = document.getElementById('calcular-proyeccion');
+            if (calculoBtn && calculoBtn.parentNode) calculoBtn.parentNode.appendChild(proyeccionContainer);
+
+            document.getElementById('calcular-proyeccion').addEventListener('click', function() {
+                const gastos = parseFloat(document.getElementById('gastos-fijos').value) || 0;
+                const margen = parseFloat(document.getElementById('margen-deseado').value) || 0;
+                const ventasActuales = parseFloat(document.getElementById('ventas-actuales').value) || 0;
+
+                if (margen <= 0) {
+                    proyeccionContainer.textContent = 'Introduzca un margen mayor que 0%.';
+                    alert('El margen debe ser mayor que 0.');
+                    return;
+                }
+
+                // Calculamos ventas necesarias para cubrir gastos dado margen deseado
+                const ventasNecesarias = gastos / (margen / 100);
+                proyeccionContainer.innerHTML = `<strong>Ventas necesarias (mes):</strong> Q. ${ventasNecesarias.toFixed(2)}<br><strong>Ventas actuales:</strong> Q. ${ventasActuales.toFixed(2)}`;
+                alert(`Ventas necesarias por mes para cubrir Q.${gastos.toFixed(2)} con margen ${margen}%: Q.${ventasNecesarias.toFixed(2)}`);
+            });
+
+            // Generar reporte simple (CSV) y export
+            document.getElementById('generar-reporte') && document.getElementById('generar-reporte').addEventListener('click', function() {
+                // generar CSV de ventas
+                const rows = [['id','producto','cantidad','precio','total','ganancia','hora']];
+                ventas.forEach(v => rows.push([v.id, v.producto, v.cantidad, v.precio, v.total, v.ganancia, new Date(v.hora).toLocaleString()]));
+                const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `reporte_ventas_${Date.now()}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(url);
+                // expose for tests
+                window.lastExported = 'reporte-ventas';
+            });
+
+            // Exportar inventario (simulación Excel/CSV) y PDF (simulación)
+            document.getElementById('exportar-excel') && document.getElementById('exportar-excel').addEventListener('click', function() {
+                const rows = [['id','nombre','categoria','stock','precio']];
+                productos.forEach(p => rows.push([p.id, p.nombre, p.categoria, p.stock, p.precio]));
+                const csv = rows.map(r => r.join(',')).join('\n');
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url; a.download = `inventario_${Date.now()}.csv`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+                window.lastExported = 'inventario-csv';
+            });
+
+            document.getElementById('exportar-pdf') && document.getElementById('exportar-pdf').addEventListener('click', function() {
+                // Simple printable report in new window
+                const w = window.open('', '_blank');
+                w.document.write('<h1>Reporte Inventario</h1>');
+                w.document.write('<pre>' + JSON.stringify(productos, null, 2) + '</pre>');
+                w.document.close();
+                window.lastExported = 'inventario-pdf-sim';
+            });
+
+            // --- GitHub Gist upload ---
+            document.getElementById('upload-github') && document.getElementById('upload-github').addEventListener('click', async function() {
+                const token = document.getElementById('github-token').value.trim();
+                const filename = document.getElementById('github-filename').value.trim() || 'backup_finanzas.json';
+                if (!token) { alert('Proporcione su GitHub Personal Access Token con permiso gist.'); return; }
+
+                const payload = { mesasActivas, productos, ventas };
+                const body = JSON.stringify({ files: { [filename]: { content: JSON.stringify(payload, null, 2) } }, public: false });
+
+                try {
+                    const res = await fetch('https://api.github.com/gists', {
+                        method: 'POST',
+                        headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json' },
+                        body
+                    });
+                    if (!res.ok) throw new Error('GitHub API error: ' + res.status);
+                    const data = await res.json();
+                    // save token locally if user wants
+                    localStorage.setItem('github_token', token);
+                    alert('Gist creado: ' + data.html_url);
+                } catch (e) {
+                    console.error(e); alert('Error subiendo a GitHub: ' + e.message);
+                }
+            });
+
+            // --- Google Sheets sync (append ventas as rows) ---
+            document.getElementById('sync-gsheet') && document.getElementById('sync-gsheet').addEventListener('click', async function() {
+                const token = document.getElementById('gcloud-token').value.trim();
+                const sheetId = document.getElementById('gcloud-sheetid').value.trim();
+                if (!token || !sheetId) { alert('Proporcione Google Access Token y Sheet ID.'); return; }
+
+                // Prepare rows: header + ventas rows
+                const rows = [['id','producto','cantidad','precio','total','ganancia','hora']];
+                ventas.forEach(v => rows.push([String(v.id), v.producto, String(v.cantidad), String(v.precio), String(v.total), String(v.ganancia), new Date(v.hora).toLocaleString()]));
+
+                try {
+                    const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Sheet1!A1:append?valueInputOption=RAW`;
+                    const res = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ values: rows })
+                    });
+                    if (!res.ok) {
+                        const txt = await res.text(); throw new Error(res.status + ' ' + txt);
+                    }
+                    localStorage.setItem('gcloud_token', token);
+                    localStorage.setItem('gcloud_sheetid', sheetId);
+                    alert('Ventas sincronizadas a Google Sheets (append).');
+                } catch (e) {
+                    console.error(e); alert('Error sincronizando con Google Sheets: ' + e.message + '\nNota: debe proporcionar un access token válido con scope sheets.');
+                }
             });
             
             // Evento para actualizar total y ganancia cuando cambia producto o cantidad
@@ -1757,30 +2017,41 @@
                 const ahora = new Date();
                 let total = 0;
                 let maxMinutes = 0;
+                let perPlayerTimes = [];
 
                 if (Array.isArray(mesa.players) && mesa.players.length) {
-                    mesa.players.forEach(p => {
+                    mesa.players.forEach((p, idx) => {
                         const inicio = new Date(p.start);
                         const minutes = (ahora - inicio) / (1000 * 60);
                         if (minutes > maxMinutes) maxMinutes = minutes;
                         total += (minutes / 60) * (mesa.tarifa || 0);
+                        perPlayerTimes.push({ index: idx + 1, minutes: minutes });
                     });
                 } else {
                     // fallback al comportamiento anterior
                     const minutes = (ahora - (mesa.inicio || ahora)) / (1000 * 60);
                     maxMinutes = minutes;
                     total = (minutes / 60) * (mesa.tarifa || 0) * (mesa.jugadores || 1);
+                    // generar entradas de jugadores genéricas
+                    for (let i = 0; i < (mesa.jugadores || 1); i++) perPlayerTimes.push({ index: i + 1, minutes: minutes });
                 }
 
                 const horas = Math.floor(maxMinutes / 60);
                 const minutos = Math.floor(maxMinutes % 60);
+
+                // Formatear tiempos individuales por jugador
+                const perPlayerDisplay = perPlayerTimes.map(p => {
+                    const h = Math.floor(p.minutes / 60);
+                    const m = Math.floor(p.minutes % 60);
+                    return `P${p.index}: ${h}h ${m}m`;
+                }).join('<br>');
 
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>Mesa ${mesa.mesa}</td>
                     <td><span class="status-active">Activa</span></td>
                     <td>${mesa.players ? mesa.players.length : mesa.jugadores} jugadores</td>
-                    <td>${horas}h ${minutos}m</td>
+                    <td style="white-space:nowrap">${horas}h ${minutos}m<br><small style='color:#555'>${perPlayerDisplay}</small></td>
                     <td>Q. ${mesa.tarifa ? mesa.tarifa.toFixed(2) : '0.00'}</td>
                     <td>Q. ${total.toFixed(2)}</td>
                     <td>
@@ -1793,6 +2064,88 @@
                     </td>
                 `;
                 tbody.appendChild(row);
+            });
+        }
+
+        // Cargar registro de mesas (finalizadas)
+        function cargarRegistroMesas() {
+            const tbody = document.getElementById('registro-mesas-body');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            // Aplicar filtros por fecha si existen
+            const fromVal = document.getElementById('registro-from') ? document.getElementById('registro-from').value : '';
+            const toVal = document.getElementById('registro-to') ? document.getElementById('registro-to').value : '';
+            let fromDate = fromVal ? new Date(fromVal + 'T00:00:00') : null;
+            let toDate = toVal ? new Date(toVal + 'T23:59:59') : null;
+
+            // Mostrar las entradas más recientes primero
+            const lista = registroMesas.slice().sort((a,b) => b.id - a.id).filter(r => {
+                if (!fromDate && !toDate) return true;
+                const f = new Date(r.fecha);
+                if (fromDate && f < fromDate) return false;
+                if (toDate && f > toDate) return false;
+                return true;
+            });
+
+            lista.forEach(r => {
+                const fecha = new Date(r.fecha);
+                const horas = Math.floor(r.tiempoHoras);
+                const minutos = Math.floor((r.tiempoHoras % 1) * 60);
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${fecha.toLocaleString()}</td>
+                    <td>Mesa ${r.mesa}</td>
+                    <td>${r.jugadores}</td>
+                    <td>${horas}h ${minutos}m</td>
+                    <td>Q. ${r.tarifaPorJugador ? r.tarifaPorJugador.toFixed(2) : '0.00'}</td>
+                    <td>Q. ${r.total.toFixed(2)}</td>
+                    <td>${r.estado}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Exportar el registro (filtrado si hay filtros aplicados) a CSV
+        function exportRegistroMesasCSV() {
+            const fromVal = document.getElementById('registro-from') ? document.getElementById('registro-from').value : '';
+            const toVal = document.getElementById('registro-to') ? document.getElementById('registro-to').value : '';
+            let fromDate = fromVal ? new Date(fromVal + 'T00:00:00') : null;
+            let toDate = toVal ? new Date(toVal + 'T23:59:59') : null;
+
+            const lista = registroMesas.slice().sort((a,b) => b.id - a.id).filter(r => {
+                if (!fromDate && !toDate) return true;
+                const f = new Date(r.fecha);
+                if (fromDate && f < fromDate) return false;
+                if (toDate && f > toDate) return false;
+                return true;
+            });
+
+            const rows = [['id','fecha','mesa','jugadores','tiempo_horas','tarifa_por_jugador','total']];
+            lista.forEach(r => rows.push([r.id, new Date(r.fecha).toLocaleString(), r.mesa, r.jugadores, r.tiempoHoras.toFixed(4), (r.tarifaPorJugador||0).toFixed(2), (r.total||0).toFixed(2)]));
+            const csv = rows.map(r => r.map(c => '"' + String(c).replace(/"/g,'""') + '"').join(',')).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = url; a.download = `registro_mesas_${Date.now()}.csv`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+            window.lastExported = 'registro-mesas-csv';
+        }
+
+        // Cargar resumen de mesas por día
+        function cargarResumenMesasPorDia() {
+            const body = document.getElementById('mesas-por-dia-body');
+            if (!body) return;
+            body.innerHTML = '';
+
+            const sums = {};
+            registroMesas.forEach(r => {
+                const d = new Date(r.fecha);
+                const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+                sums[key] = (sums[key] || 0) + (r.total || 0);
+            });
+
+            Object.keys(sums).sort((a,b) => b.localeCompare(a)).forEach(k => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${k}</td><td>Q. ${sums[k].toFixed(2)}</td>`;
+                body.appendChild(tr);
             });
         }
         
@@ -1924,6 +2277,7 @@
             
             if (producto) {
                 document.getElementById('producto-nombre').value = producto.nombre;
+                document.getElementById('producto-id').value = producto.id;
                 document.getElementById('categoria').value = producto.categoria;
                 document.getElementById('costo-compra').value = producto.costo;
                 document.getElementById('precio-venta-inv').value = producto.precio;
@@ -1949,6 +2303,7 @@
             localStorage.setItem('mesasActivas', JSON.stringify(mesasActivas));
             localStorage.setItem('productos', JSON.stringify(productos));
             localStorage.setItem('ventas', JSON.stringify(ventas));
+            localStorage.setItem('registroMesas', JSON.stringify(registroMesas));
         }
         
         // Cargar datos desde localStorage (reconstruir fechas de players)
@@ -1956,6 +2311,7 @@
             const mesasGuardadas = localStorage.getItem('mesasActivas');
             const productosGuardados = localStorage.getItem('productos');
             const ventasGuardadas = localStorage.getItem('ventas');
+            const registroGuardado = localStorage.getItem('registroMesas');
 
             if (mesasGuardadas) {
                 try {
@@ -1974,6 +2330,12 @@
             }
             if (productosGuardados) productos = JSON.parse(productosGuardados);
             if (ventasGuardadas) ventas = JSON.parse(ventasGuardadas);
+            if (registroGuardado) {
+                try {
+                    registroMesas = JSON.parse(registroGuardado);
+                    registroMesas.forEach(r => { if (r.fecha) r.fecha = new Date(r.fecha); });
+                } catch (e) { console.warn('Error parseando registroMesas', e); registroMesas = []; }
+            }
         }
         
         // Inicializar gráficos
