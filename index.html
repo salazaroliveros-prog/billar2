@@ -1,0 +1,2169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M&S Control Finanzas App - EDIFICANDO EL FUTURO</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="favicon.ico">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <meta name="theme-color" content="#2c3e50">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --gray-color: #95a5a6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+        
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .app-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            color: var(--warning-color);
+        }
+
+        /* Local icon fallbacks */
+        .local-icon { width: 18px; height: 18px; vertical-align: middle; display: inline-block; }
+        .local-header-logo { width: 48px; height: 48px; vertical-align: middle; display: inline-block; }
+        
+        .app-name h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        
+        .app-name p {
+            font-style: italic;
+            opacity: 0.9;
+        }
+        
+        .date-display {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        
+        /* Navigation */
+        nav {
+            background-color: white;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .nav-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            list-style: none;
+        }
+        
+        .nav-tabs li {
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .nav-tabs li a {
+            display: block;
+            padding: 18px 15px;
+            text-align: center;
+            text-decoration: none;
+            color: var(--primary-color);
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-tabs li a:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+            color: var(--secondary-color);
+        }
+        
+        .nav-tabs li a.active {
+            color: var(--secondary-color);
+            border-bottom-color: var(--secondary-color);
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+        
+        .nav-tabs li a i {
+            margin-right: 8px;
+        }
+        
+        /* Main Content */
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Dashboard Cards */
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+        
+        .card-title i {
+            font-size: 1.5rem;
+        }
+        
+        .card-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .card-subtitle {
+            color: var(--gray-color);
+            font-size: 0.9rem;
+        }
+        
+        /* Charts Container */
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-box {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .chart-title {
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        /* Tables */
+        .table-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        table th {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+        
+        table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        table tr:hover {
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+        
+        /* Forms */
+        .form-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+        
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            flex: 1;
+            min-width: 250px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border 0.3s ease;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #219653;
+        }
+        
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background-color: #e67e22;
+        }
+        
+        .btn-danger {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        /* Status indicators */
+        .status-active {
+            background-color: rgba(39, 174, 96, 0.1);
+            color: var(--success-color);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .status-inactive {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: var(--accent-color);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: var(--gray-color);
+            font-size: 0.9rem;
+            border-top: 1px solid #eee;
+            margin-top: 30px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 992px) {
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-tabs li {
+                min-width: 100px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .app-title {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+            }
+            
+            .dashboard-cards {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+        }
+        
+        /* Utility Classes */
+        .text-success {
+            color: var(--success-color);
+        }
+        
+        .text-danger {
+            color: var(--accent-color);
+        }
+        
+        .text-warning {
+            color: var(--warning-color);
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .mb-20 {
+            margin-bottom: 20px;
+        }
+        
+        .mt-20 {
+            margin-top: 20px;
+        }
+        
+        .d-flex {
+            display: flex;
+        }
+        
+        .justify-between {
+            justify-content: space-between;
+        }
+        
+        .justify-end {
+            justify-content: flex-end;
+        }
+        .btn-table-action {
+            padding: 5px 10px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="app-title">
+                <div class="logo-container">
+                    <div class="logo">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="app-name">
+                        <h1>M&S Control Finanzas App</h1>
+                        <p>EDIFICANDO EL FUTURO</p>
+                    </div>
+                </div>
+                <div class="date-display">
+                    <span id="current-date"></span>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Navigation -->
+        <nav>
+            <ul class="nav-tabs">
+                <li><a href="#dashboard" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="#mesas"><i class="fas fa-table"></i> Mesas de Billar</a></li>
+                <li><a href="#ventas"><i class="fas fa-shopping-cart"></i> Ventas Snacks</a></li>
+                <li><a href="#pendientes"><i class="fas fa-clock"></i> Pendientes</a></li>
+                <li><a href="#inventario"><i class="fas fa-boxes"></i> Inventario</a></li>
+                <li><a href="#finanzas"><i class="fas fa-calculator"></i> Finanzas</a></li>
+                <li><a href="#reportes"><i class="fas fa-chart-bar"></i> Reportes</a></li>
+                <li><a href="#config"><i class="fas fa-cog"></i> Configuración</a></li>
+            </ul>
+        </nav>
+        
+        <!-- Dashboard Tab -->
+        <section id="dashboard" class="tab-content active">
+            <div class="dashboard-cards">
+                <div class="card">
+                    <div class="card-title">
+                        <h3>Ingreso Total Hoy</h3>
+                        <i class="fas fa-money-bill-wave text-success"></i>
+                    </div>
+                    <div class="card-value text-success">Q. 0.00</div>
+                    <div class="card-subtitle">Mesas: Q. 0.00 | Snacks: Q. 0.00</div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">
+                        <h3>Ganancias del Mes</h3>
+                        <i class="fas fa-chart-line text-success"></i>
+                    </div>
+                    <div class="card-value text-success">Q. 0.00</div>
+                    <div class="card-subtitle">—</div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">
+                        <h3>Meta de Ventas</h3>
+                        <i class="fas fa-bullseye text-warning"></i>
+                    </div>
+                    <div class="card-value text-warning">0%</div>
+                    <div class="card-subtitle">Q. 0 / Q. 0</div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">
+                        <h3>Productos Bajos</h3>
+                        <i class="fas fa-exclamation-triangle text-danger"></i>
+                    </div>
+                    <div class="card-value text-danger">0</div>
+                    <div class="card-subtitle">Necesitan reposición</div>
+                </div>
+            </div>
+            
+            <div class="charts-container">
+                <div class="chart-box">
+                    <div class="chart-title">
+                        <h3>Ingresos por Mesas (Esta Semana)</h3>
+                    </div>
+                    <canvas id="incomeChart"></canvas>
+                </div>
+                
+                <div class="chart-box">
+                    <div class="chart-title">
+                        <h3>Ventas por Categoría</h3>
+                    </div>
+                    <canvas id="salesChart"></canvas>
+                </div>
+                
+                <div class="chart-box">
+                    <div class="chart-title">
+                        <h3>Meta vs Real (Este Mes)</h3>
+                    </div>
+                    <canvas id="goalChart"></canvas>
+                </div>
+                
+                <div class="chart-box">
+                    <div class="chart-title">
+                        <h3>Productos Más Vendidos</h3>
+                    </div>
+                    <canvas id="topProductsChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <div class="d-flex justify-between mb-20">
+                    <h3>Estado Actual de Mesas</h3>
+                    <button class="btn btn-primary" onclick="openTab('mesas')"><i class="fas fa-plus"></i> Nueva Mesa</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Mesa</th>
+                            <th>Estado</th>
+                            <th>Jugadores</th>
+                            <th>Tiempo Transcurrido</th>
+                            <th>Total a Pagar</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="mesas-table-body">
+                        <!-- Las mesas se cargarán dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        
+        <!-- Pendientes Tab (fusionado desde 'cuentas por cobrar .html') -->
+        <section id="pendientes" class="tab-content">
+            <div class="form-container">
+                <h3 class="mb-20">Cuentas por Cobrar</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="buscar-cliente">Buscar Cliente</label>
+                        <input type="text" id="buscar-cliente" placeholder="Nombre o teléfono del cliente">
+                    </div>
+                    <div class="form-group">
+                        <label for="filtro-fecha">Filtrar por Fecha</label>
+                        <select id="filtro-fecha">
+                            <option value="todos">Todos</option>
+                            <option value="hoy">Hoy</option>
+                            <option value="semana">Esta semana</option>
+                            <option value="mes">Este mes</option>
+                            <option value="vencidos">Vencidos</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="ordenar-por">Ordenar por</label>
+                        <select id="ordenar-por">
+                            <option value="fecha">Fecha más antigua</option>
+                            <option value="monto">Monto mayor</option>
+                            <option value="dias">Días pendientes</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="d-flex justify-end">
+                    <button class="btn btn-primary" id="buscar-pendientes"><i class="fas fa-search"></i> Buscar</button>
+                    <button class="btn btn-success" id="exportar-pendientes" style="margin-left: 10px;"><i class="fas fa-file-excel"></i> Exportar</button>
+                </div>
+            </div>
+            
+            <div class="dashboard-cards">
+                <div class="card">
+                    <div class="card-title">
+                        <h3>Total Pendiente</h3>
+                        <i class="fas fa-money-bill-wave text-warning"></i>
+                    </div>
+                    <div class="card-value text-warning" id="total-pendiente">Q. 0.00</div>
+                    <div class="card-subtitle">Cuentas por cobrar</div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">
+                        <h3>Ventas Pendientes</h3>
+                        <i class="fas fa-clock text-warning"></i>
+                    </div>
+                    <div class="card-value text-warning" id="count-pendientes">0</div>
+                    <div class="card-subtitle">Transacciones pendientes</div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">
+                        <h3>Promedio Días</h3>
+                        <i class="fas fa-calendar-alt text-danger"></i>
+                    </div>
+                    <div class="card-value text-danger" id="promedio-dias">0</div>
+                    <div class="card-subtitle">Días promedio pendiente</div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">
+                        <h3>Clientes con Deuda</h3>
+                        <i class="fas fa-users text-danger"></i>
+                    </div>
+                    <div class="card-value text-danger" id="count-clientes">0</div>
+                    <div class="card-subtitle">Clientes con saldo pendiente</div>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <div class="d-flex justify-between mb-20 align-center">
+                    <h3>Ventas Pendientes de Pago</h3>
+                    <button class="btn btn-warning" id="nuevo-credito-btn"><i class="fas fa-plus"></i> Nuevo Crédito</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Cliente</th>
+                            <th>Teléfono</th>
+                            <th>Productos</th>
+                            <th>Total</th>
+                            <th>Fecha</th>
+                            <th>Días</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pendientes-completo-body">
+                        <!-- Todas las ventas pendientes se cargarán dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        
+        <!-- Mesas de Billar Tab -->
+        <section id="mesas" class="tab-content">
+            <div class="form-container">
+                <h3 class="mb-20">Control de Mesas de Billar</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="mesa-select">Mesa</label>
+                        <select id="mesa-select">
+                            <option value="1">Mesa 1</option>
+                            <option value="2">Mesa 2</option>
+                            <option value="3">Mesa 3</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="jugadores-count">Número de Jugadores</label>
+                        <input type="number" id="jugadores-count" min="1" max="6" value="2">
+                    </div>
+                    <div class="form-group">
+                        <label for="tarifa">Tarifa por Hora (por jugador)</label>
+                        <input type="number" id="tarifa" value="0.00" step="0.01">
+                    </div>
+                </div>
+                <div class="d-flex justify-end">
+                    <button class="btn btn-success" id="iniciar-mesa"><i class="fas fa-play"></i> Iniciar Juego</button>
+                    <button class="btn btn-danger" id="detener-mesa" style="margin-left: 10px;"><i class="fas fa-stop"></i> Detener Juego</button>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <h3 class="mb-20">Registro de Mesas</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Mesa</th>
+                            <th>Jugadores</th>
+                            <th>Tiempo</th>
+                            <th>Tarifa por Jugador</th>
+                            <th>Total</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="registro-mesas-body">
+                        <!-- Registro de mesas se cargará dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        
+        <!-- Ventas Snacks Tab -->
+        <section id="ventas" class="tab-content">
+            <div class="form-container">
+                <h3 class="mb-20">Registrar Venta de Snacks/Bebidas</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="producto-select">Producto</label>
+                        <select id="producto-select">
+                            <!-- Productos se cargarán dinámicamente -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="cantidad">Cantidad</label>
+                        <input type="number" id="cantidad" min="1" value="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="precio-venta">Precio de Venta (Q.)</label>
+                        <input type="number" id="precio-venta" step="0.01" readonly>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="total-venta">Total Venta (Q.)</label>
+                        <input type="number" id="total-venta" step="0.01" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="ganancia">Ganancia Estimada (Q.)</label>
+                        <input type="number" id="ganancia" step="0.01" readonly>
+                    </div>
+                </div>
+                <div class="d-flex justify-end">
+                    <button class="btn btn-success" id="registrar-venta"><i class="fas fa-cash-register"></i> Registrar Venta</button>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <h3 class="mb-20">Historial de Ventas (Hoy)</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                            <th>Precio Unitario</th>
+                            <th>Total</th>
+                            <th>Ganancia</th>
+                            <th>Hora</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ventas-historial-body">
+                        <!-- Historial de ventas se cargará dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        
+        <!-- Inventario Tab -->
+        <section id="inventario" class="tab-content">
+            <div class="form-container">
+                <h3 class="mb-20">Gestionar Inventario</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="producto-nombre">Nombre del Producto</label>
+                        <input type="text" id="producto-nombre" placeholder="Ej. Producto">
+                    </div>
+                    <div class="form-group">
+                        <label for="categoria">Categoría</label>
+                        <select id="categoria">
+                            <option value="bebida">Bebida</option>
+                            <option value="snack">Snack</option>
+                            <option value="dulce">Dulce</option>
+                            <option value="otros">Otros</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="costo-compra">Costo de Compra (Q.)</label>
+                        <input type="number" id="costo-compra" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="precio-venta-inv">Precio de Venta (Q.)</label>
+                        <input type="number" id="precio-venta-inv" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="stock">Stock Inicial</label>
+                        <input type="number" id="stock" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="stock-minimo">Stock Mínimo</label>
+                        <input type="number" id="stock-minimo" min="0" value="0">
+                    </div>
+                </div>
+                <div class="d-flex justify-end">
+                    <button class="btn btn-primary" id="agregar-producto"><i class="fas fa-plus"></i> Agregar Producto</button>
+                    <button class="btn btn-warning" id="actualizar-producto" style="margin-left: 10px;"><i class="fas fa-edit"></i> Actualizar Producto</button>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <div class="d-flex justify-between mb-20">
+                    <h3>Inventario Actual</h3>
+                    <div>
+                        <button class="btn btn-success" id="exportar-inventario"><i class="fas fa-file-export"></i> Exportar PDF</button>
+                        <button class="btn btn-primary" id="sincronizar-nube" style="margin-left: 10px;"><i class="fas fa-cloud-upload-alt"></i> Sincronizar Nube</button>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Categoría</th>
+                            <th>Stock</th>
+                            <th>Stock Mínimo</th>
+                            <th>Costo Compra</th>
+                            <th>Precio Venta</th>
+                            <th>Ganancia Unitaria</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventario-body">
+                        <!-- Inventario se cargará dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        
+        <!-- Finanzas Tab -->
+        <section id="finanzas" class="tab-content">
+            <div class="dashboard-cards">
+                <div class="card">
+                    <div class="card-title">
+                        <h3>Gastos Fijos Mensuales</h3>
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <div class="card-value">Q. 0.00</div>
+                    <div class="card-subtitle">—</div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">
+                        <h3>Ventas Necesarias (Semana)</h3>
+                        <i class="fas fa-calculator"></i>
+                    </div>
+                    <div class="card-value">Q. 0.00</div>
+                    <div class="card-subtitle">—</div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">
+                        <h3>Ventas Necesarias (Mes)</h3>
+                        <i class="fas fa-calculator"></i>
+                    </div>
+                    <div class="card-value">Q. 0.00</div>
+                    <div class="card-subtitle">—</div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">
+                        <h3>Margen Promedio</h3>
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                    <div class="card-value text-success">0%</div>
+                    <div class="card-subtitle">Ganancia sobre ventas</div>
+                </div>
+            </div>
+            
+            <div class="form-container">
+                <h3 class="mb-20">Proyección Financiera</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="gastos-fijos">Gastos Fijos Mensuales (Q.)</label>
+                        <input type="number" id="gastos-fijos" value="0.00" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="margen-deseado">Margen de Ganancia Deseado (%)</label>
+                        <input type="number" id="margen-deseado" value="0" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="ventas-actuales">Ventas Actuales (Mes) (Q.)</label>
+                        <input type="number" id="ventas-actuales" value="0.00" step="0.01">
+                    </div>
+                </div>
+                <div class="d-flex justify-end">
+                    <button class="btn btn-primary" id="calcular-proyeccion"><i class="fas fa-calculator"></i> Calcular Proyección</button>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <h3 class="mb-20">Resumen Financiero del Mes</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Concepto</th>
+                            <th>Monto (Q.)</th>
+                            <th>Porcentaje</th>
+                            <th>Comentarios</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Ingresos por Mesas</td>
+                            <td>0.00</td>
+                            <td>0%</td>
+                            <td>—</td>
+                        </tr>
+                        <tr>
+                            <td>Ingresos por Snacks</td>
+                            <td>0.00</td>
+                            <td>0%</td>
+                            <td>—</td>
+                        </tr>
+                        <tr class="text-success">
+                            <td><strong>Total Ingresos</strong></td>
+                            <td><strong>0.00</strong></td>
+                            <td><strong>0%</strong></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>Gastos Fijos</td>
+                            <td>0.00</td>
+                            <td>0%</td>
+                            <td>—</td>
+                        </tr>
+                        <tr>
+                            <td>Compras Productos</td>
+                            <td>1,856.00</td>
+                            <td>14.9%</td>
+                            <td>Para reabastecimiento</td>
+                        </tr>
+                        <tr>
+                            <td>Otros Gastos</td>
+                            <td>745.00</td>
+                            <td>6.0%</td>
+                            <td>Servicios, mantenimiento</td>
+                        </tr>
+                        <tr class="text-danger">
+                            <td><strong>Total Gastos</strong></td>
+                            <td><strong>5,601.00</strong></td>
+                            <td><strong>45.0%</strong></td>
+                            <td></td>
+                        </tr>
+                        <tr class="text-success">
+                            <td><strong>Ganancia Neta</strong></td>
+                            <td><strong>6,849.00</strong></td>
+                            <td><strong>55.0%</strong></td>
+                            <td>Margen saludable</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        
+        <!-- Reportes Tab -->
+        <section id="reportes" class="tab-content">
+            <div class="form-container">
+                <h3 class="mb-20">Generar Reportes</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="tipo-reporte">Tipo de Reporte</label>
+                        <select id="tipo-reporte">
+                            <option value="diario">Diario</option>
+                            <option value="semanal">Semanal</option>
+                            <option value="mensual">Mensual</option>
+                            <option value="inventario">Inventario</option>
+                            <option value="financiero">Financiero Completo</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="fecha-desde">Desde</label>
+                        <input type="date" id="fecha-desde">
+                    </div>
+                    <div class="form-group">
+                        <label for="fecha-hasta">Hasta</label>
+                        <input type="date" id="fecha-hasta">
+                    </div>
+                </div>
+                <div class="d-flex justify-end">
+                    <button class="btn btn-primary" id="generar-reporte"><i class="fas fa-chart-bar"></i> Generar Reporte</button>
+                    <button class="btn btn-success" id="exportar-pdf" style="margin-left: 10px;"><i class="fas fa-file-pdf"></i> Exportar PDF</button>
+                    <button class="btn btn-warning" id="exportar-excel" style="margin-left: 10px;"><i class="fas fa-file-excel"></i> Exportar Excel</button>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <h3 class="mb-20">Reporte Semanal</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Día</th>
+                            <th>Ingresos Mesas</th>
+                            <th>Ingresos Snacks</th>
+                            <th>Total Ingresos</th>
+                            <th>Gastos</th>
+                            <th>Ganancia</th>
+                            <th>Clientes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Lunes</td>
+                            <td>Q. 0.00</td>
+                            <td>Q. 0.00</td>
+                            <td>Q. 0.00</td>
+                            <td>Q. 0.00</td>
+                            <td class="text-success">Q. 0.00</td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>Martes</td>
+                            <td>Q. 0.00</td>
+                            <td>Q. 0.00</td>
+                            <td>Q. 0.00</td>
+                            <td>Q. 0.00</td>
+                            <td class="text-success">Q. 0.00</td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>Miércoles</td>
+                            <td>Q. 0.00</td>
+                            <td>Q. 0.00</td>
+                            <td>Q. 0.00</td>
+                            <td>Q. 0.00</td>
+                            <td class="text-success">Q. 0.00</td>
+                            <td>0</td>
+                        </tr>
+                            <td>Q. 110.00</td>
+                            <td class="text-success">Q. 680.00</td>
+                            <td>32</td>
+                        </tr>
+                        <tr>
+                            <td>Jueves</td>
+                            <td>Q. 780.00</td>
+                            <td>Q. 220.00</td>
+                            <td>Q. 1,000.00</td>
+                            <td>Q. 150.00</td>
+                            <td class="text-success">Q. 850.00</td>
+                            <td>45</td>
+                        </tr>
+                        <tr>
+                            <td>Viernes</td>
+                            <td>Q. 1,050.00</td>
+                            <td>Q. 320.00</td>
+                            <td>Q. 1,370.00</td>
+                            <td>Q. 205.00</td>
+                            <td class="text-success">Q. 1,165.00</td>
+                            <td>62</td>
+                        </tr>
+                        <tr>
+                            <td>Sábado</td>
+                            <td>Q. 1,350.00</td>
+                            <td>Q. 410.00</td>
+                            <td>Q. 1,760.00</td>
+                            <td>Q. 265.00</td>
+                            <td class="text-success">Q. 1,495.00</td>
+                            <td>78</td>
+                        </tr>
+                        <tr>
+                            <td>Domingo</td>
+                            <td>Q. 920.00</td>
+                            <td>Q. 280.00</td>
+                            <td>Q. 1,200.00</td>
+                            <td>Q. 180.00</td>
+                            <td class="text-success">Q. 1,020.00</td>
+                            <td>54</td>
+                        </tr>
+                        <tr class="text-success">
+                            <td><strong>TOTAL</strong></td>
+                            <td><strong>Q. 5,680.00</strong></td>
+                            <td><strong>Q. 1,665.00</strong></td>
+                            <td><strong>Q. 7,345.00</strong></td>
+                            <td><strong>Q. 1,087.00</strong></td>
+                            <td><strong>Q. 6,258.00</strong></td>
+                            <td><strong>323</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        
+        <!-- Configuración Tab -->
+        <section id="config" class="tab-content">
+            <div class="form-container">
+                <h3 class="mb-20">Configuración de la Aplicación</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="tarifa-base">Tarifa Base por Hora (Q.)</label>
+                        <input type="number" id="tarifa-base" value="10.00" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="gastos-fijos-config">Gastos Fijos Mensuales (Q.)</label>
+                        <input type="number" id="gastos-fijos-config" value="3000.00" step="0.01">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="notificaciones-stock">Notificar cuando stock sea menor a:</label>
+                        <input type="number" id="notificaciones-stock" value="5" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="sincronizacion-auto">Sincronización Automática</label>
+                        <select id="sincronizacion-auto">
+                            <option value="si">Sí</option>
+                            <option value="no">No</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="backup-frecuencia">Frecuencia de Backup</label>
+                        <select id="backup-frecuencia">
+                            <option value="diario">Diario</option>
+                            <option value="semanal" selected>Semanal</option>
+                            <option value="mensual">Mensual</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="tema-aplicacion">Tema de la Aplicación</label>
+                        <select id="tema-aplicacion">
+                            <option value="claro">Claro</option>
+                            <option value="oscuro">Oscuro</option>
+                            <option value="automatico">Automático</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="d-flex justify-end">
+                    <button class="btn btn-primary" id="guardar-config"><i class="fas fa-save"></i> Guardar Configuración</button>
+                    <button class="btn btn-warning" id="restaurar-default" style="margin-left: 10px;"><i class="fas fa-undo"></i> Restaurar Valores</button>
+                    <button class="btn btn-danger" id="limpiar-datos" style="margin-left: 10px;"><i class="fas fa-trash"></i> Limpiar Datos</button>
+                </div>
+            </div>
+            
+            <div class="form-container mt-20">
+                <h3 class="mb-20">Sincronización con la Nube</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="tipo-nube">Servicio en la Nube</label>
+                        <select id="tipo-nube">
+                            <option value="google">Google Sheets</option>
+                            <option value="firebase">Firebase</option>
+                            <option value="dropbox">Dropbox</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="api-key">API Key (opcional)</label>
+                        <input type="password" id="api-key" placeholder="Ingrese su API Key">
+                    </div>
+                </div>
+                <div class="d-flex justify-end">
+                    <button class="btn btn-success" id="sincronizar-ahora"><i class="fas fa-sync-alt"></i> Sincronizar Ahora</button>
+                    <button class="btn btn-primary" id="configurar-nube" style="margin-left: 10px;"><i class="fas fa-cloud"></i> Configurar Conexión</button>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Footer -->
+        <footer>
+            <p>M&S Control Finanzas App - "EDIFICANDO EL FUTURO" | © 2023 Todos los derechos reservados</p>
+            <p class="mt-20">Esta aplicación almacena todos los datos localmente en su navegador. Para mayor seguridad, realice copias de seguridad periódicas.</p>
+        </footer>
+    </div>
+
+    <!-- Modales para Cuentas por Cobrar (fusionados) -->
+    <div id="modal-pago" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Registrar Pago</h3>
+                <button class="close-modal" data-close-modal="modal-pago">&times;</button>
+            </div>
+            <div class="form-container">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="modal-cliente">Cliente</label>
+                        <input type="text" id="modal-cliente" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="modal-total">Total Pendiente</label>
+                        <input type="number" id="modal-total" readonly>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="modal-monto">Monto a Pagar (Q.)</label>
+                        <input type="number" id="modal-monto" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="modal-metodo">Método de Pago</label>
+                        <select id="modal-metodo">
+                            <option value="efectivo">Efectivo</option>
+                            <option value="tarjeta">Tarjeta</option>
+                            <option value="transferencia">Transferencia</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="modal-notas">Notas</label>
+                        <textarea id="modal-notas" rows="3" placeholder="Observaciones del pago"></textarea>
+                    </div>
+                </div>
+                <div class="d-flex justify-end">
+                    <button class="btn btn-warning" data-close-modal="modal-pago">Cancelar</button>
+                    <button class="btn btn-success" id="registrar-pago-btn" style="margin-left: 10px;">Registrar Pago</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-nuevo-credito" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Nueva Venta a Crédito</h3>
+                <button class="close-modal" data-close-modal="modal-nuevo-credito">&times;</button>
+            </div>
+            <div class="form-container">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nuevo-cliente">Cliente *</label>
+                        <input type="text" id="nuevo-cliente" placeholder="Nombre completo del cliente" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="nuevo-telefono">Teléfono</label>
+                        <input type="text" id="nuevo-telefono" placeholder="Teléfono de contacto">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nuevo-producto">Producto *</label>
+                        <select id="nuevo-producto"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="nuevo-cantidad">Cantidad *</label>
+                        <input type="number" id="nuevo-cantidad" min="1" value="1">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nuevo-total">Total (Q.)</label>
+                        <input type="number" id="nuevo-total" step="0.01" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="nuevo-fecha">Fecha de Vencimiento</label>
+                        <input type="date" id="nuevo-fecha">
+                    </div>
+                </div>
+                <div class="d-flex justify-end">
+                    <button class="btn btn-warning" data-close-modal="modal-nuevo-credito">Cancelar</button>
+                    <button class="btn btn-success" id="guardar-nuevo-credito-btn" style="margin-left: 10px;">Guardar Crédito</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // Módulo encapsulado para integrar Cuentas por Cobrar sin duplicar globales
+    (function(win, doc){
+        const storageKey = 'pendientes';
+        let pendientes = [];
+
+        function q(id){ return doc.getElementById(id); }
+
+        function load() {
+            const raw = localStorage.getItem(storageKey);
+            pendientes = raw ? JSON.parse(raw).map(p => ({...p, fecha: new Date(p.fecha)})) : [];
+        }
+
+        function save(){
+            localStorage.setItem(storageKey, JSON.stringify(pendientes));
+        }
+
+        function diasDesde(fecha){ return Math.floor((new Date() - new Date(fecha)) / (1000*60*60*24)); }
+
+        function renderResumen(){
+            const activos = pendientes.filter(p => p.estado === 'pendiente');
+            const total = activos.reduce((s,p)=>s+p.total,0);
+            q('total-pendiente').textContent = `Q. ${total.toFixed(2)}`;
+            q('count-pendientes').textContent = activos.length;
+            q('finanzas-pendientes') && (q('finanzas-pendientes').textContent = `Q. ${total.toFixed(2)}`);
+            if(activos.length>0){
+                const prom = Math.round(activos.reduce((s,p)=>s+diasDesde(p.fecha),0)/activos.length);
+                q('promedio-dias').textContent = prom;
+            } else q('promedio-dias').textContent = '0';
+            const clientes = [...new Set(activos.map(p=>p.cliente))];
+            q('count-clientes').textContent = clientes.length;
+            q('pendientes-count') && (q('pendientes-count').textContent = `${activos.length} ventas pendientes`);
+        }
+
+        function renderTabla(){
+            const tbody = q('pendientes-completo-body');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            const activos = pendientes.filter(p => p.estado === 'pendiente');
+            activos.forEach(p => {
+                const dias = diasDesde(p.fecha);
+                const productosTexto = p.productos.map(i=>`${i.cantidad}x ${i.nombre}`).join(', ');
+                const tr = doc.createElement('tr');
+                tr.innerHTML = `
+                    <td>${p.cliente || 'Cliente no registrado'}</td>
+                    <td>${p.telefono || 'N/A'}</td>
+                    <td>${productosTexto}</td>
+                    <td>Q. ${p.total.toFixed(2)}</td>
+                    <td>${new Date(p.fecha).toLocaleDateString()}</td>
+                    <td>${dias}</td>
+                    <td><span class="status-pending">Pendiente</span></td>
+                    <td>
+                        <button class="btn btn-success btn-sm" data-cobrar="${p.id}"><i class="fas fa-money-bill-wave"></i></button>
+                        <button class="btn btn-danger btn-sm" data-eliminar="${p.id}" style="margin-left:5px;"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function abrirModalPago(id){
+            const p = pendientes.find(x=>x.id===id); if(!p) return alert('Venta no encontrada.');
+            q('modal-cliente').value = p.cliente;
+            q('modal-total').value = p.total;
+            q('modal-monto').value = p.total;
+            q('modal-monto').max = p.total;
+            q('modal-notas').value = p.notas || '';
+            openModal('modal-pago');
+            q('registrar-pago-btn').dataset.currentId = id;
+        }
+
+        function registrarPago(){
+            const id = parseInt(q('registrar-pago-btn').dataset.currentId);
+            const monto = parseFloat(q('modal-monto').value)||0;
+            const metodo = q('modal-metodo').value;
+            if(monto<=0) return alert('Ingrese un monto válido.');
+            const idx = pendientes.findIndex(p=>p.id===id); if(idx===-1) return alert('Venta no encontrada.');
+            const p = pendientes[idx];
+            if(monto>=p.total){
+                p.estado='pagado'; p.metodo=metodo; p.notas = (p.notas||'') + ' | Pago completo';
+                // intentar mover a ventas global si existe
+                if(Array.isArray(win.ventas)) win.ventas.push(p);
+                pendientes.splice(idx,1);
+            } else {
+                p.total = +(p.total - monto).toFixed(2);
+                p.notas = (p.notas||'') + ` | Pago parcial Q.${monto.toFixed(2)} el ${new Date().toLocaleDateString()}`;
+                if(Array.isArray(win.ventas)) win.ventas.push({...p, id: Date.now(), total: monto, estado:'pagado'});
+            }
+            save();
+            closeModal('modal-pago');
+            renderResumen(); renderTabla();
+            alert(`Pago registrado por Q.${monto.toFixed(2)}`);
+        }
+
+        function eliminarPendiente(id){
+            if(!confirm('¿Eliminar esta venta pendiente?')) return;
+            const idx = pendientes.findIndex(p=>p.id===id); if(idx===-1) return;
+            pendientes.splice(idx,1); save(); renderResumen(); renderTabla();
+        }
+
+        function abrirNuevoCredito(){
+            // cargar productos en select si existen productos globales
+            const select = q('nuevo-producto');
+            select.innerHTML = '<option value="">Seleccione un producto</option>';
+            if(Array.isArray(win.productos)){
+                win.productos.forEach(prod=>{
+                    const opt = doc.createElement('option'); opt.value = prod.id; opt.textContent = `${prod.nombre} - Q.${prod.precio.toFixed(2)} (Stock: ${prod.stock})`;
+                    select.appendChild(opt);
+                });
+            }
+            const fecha = new Date(); fecha.setDate(fecha.getDate()+30);
+            q('nuevo-fecha').value = fecha.toISOString().split('T')[0];
+            openModal('modal-nuevo-credito');
+        }
+
+        function guardarNuevoCredito(){
+            const cliente = q('nuevo-cliente').value.trim(); if(!cliente) return alert('Ingrese nombre del cliente');
+            const telefono = q('nuevo-telefono').value.trim();
+            const productoId = parseInt(q('nuevo-producto').value); const cantidad = parseInt(q('nuevo-cantidad').value)||1;
+            if(!productoId) return alert('Seleccione un producto');
+            const prod = Array.isArray(win.productos) ? win.productos.find(p=>p.id===productoId) : null;
+            if(!prod) return alert('Producto no encontrado');
+            if(prod.stock < cantidad) return alert(`Stock insuficiente. Solo ${prod.stock} disponibles.`);
+            const total = +(cantidad * prod.precio).toFixed(2);
+            const nuevo = { id: Date.now(), cliente, telefono, productos: [{id: prod.id, nombre: prod.nombre, cantidad, precio: prod.precio}], total, fecha: new Date(), estado:'pendiente', notas: `Vence: ${q('nuevo-fecha').value}` };
+            pendientes.push(nuevo);
+            // disminuir stock global si existe
+            if(Array.isArray(win.productos)){
+                const idx = win.productos.findIndex(p=>p.id===prod.id);
+                if(idx!==-1) win.productos[idx].stock -= cantidad;
+            }
+            save(); closeModal('modal-nuevo-credito'); renderResumen(); renderTabla(); alert(`Crédito registrado para ${cliente} por Q.${total.toFixed(2)}`);
+        }
+
+        // Simple open/close modal helpers (no override if exist)
+        if(typeof win.openModal !== 'function'){
+            win.openModal = function(id){ const el = q(id); if(el) el.style.display='flex'; };
+        }
+        if(typeof win.closeModal !== 'function'){
+            win.closeModal = function(id){ const el = q(id); if(el) el.style.display='none'; };
+        }
+
+        function setup(){
+            load(); renderResumen(); renderTabla();
+            // bind events
+            doc.addEventListener('click', function(e){
+                const cobrar = e.target.closest('[data-cobrar]');
+                if(cobrar){ abrirModalPago(parseInt(cobrar.getAttribute('data-cobrar'))); }
+                const eliminar = e.target.closest('[data-eliminar]');
+                if(eliminar){ eliminarPendiente(parseInt(eliminar.getAttribute('data-eliminar'))); }
+                const closeBtn = e.target.closest('[data-close-modal]');
+                if(closeBtn){ closeModal(closeBtn.getAttribute('data-close-modal')); }
+            });
+
+            q('buscar-pendientes') && q('buscar-pendientes').addEventListener('click', function(){ renderTabla(); });
+            q('nuevo-credito-btn') && q('nuevo-credito-btn').addEventListener('click', abrirNuevoCredito);
+            q('registrar-pago-btn') && q('registrar-pago-btn').addEventListener('click', registrarPago);
+            q('guardar-nuevo-credito-btn') && q('guardar-nuevo-credito-btn').addEventListener('click', guardarNuevoCredito);
+            // ensure nav link opens tab
+            const navPend = doc.querySelector('.nav-tabs a[href="#pendientes"]');
+            if(navPend) navPend.addEventListener('click', function(e){ e.preventDefault(); if(typeof win.openTab==='function') win.openTab('pendientes'); else location.hash='#pendientes'; });
+        }
+
+        // Exponer módulo para debugging
+        win.pendientesModule = { setup, load, pendientes };
+        // init after DOM ready
+        if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', setup); else setup();
+    })(window, document);
+    </script>
+    <script>
+        // Variables globales
+        let mesasActivas = [];
+        let productos = [];
+        let ventas = [];
+        let inventario = [];
+        
+        // Inicializar la aplicación
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mostrar fecha actual
+            const currentDate = new Date();
+            document.getElementById('current-date').textContent = currentDate.toLocaleDateString('es-GT', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            // Inicializar datos de ejemplo
+            inicializarDatos();
+            
+            // Configurar navegación por pestañas
+            setupNavigation();
+            
+            // Configurar eventos de botones
+            setupEventListeners();
+            
+            // Cargar datos en las tablas
+            cargarMesasActivas();
+            cargarInventario();
+            cargarProductosSelect();
+            
+            // Inicializar gráficos
+            inicializarGraficos();
+        });
+        
+        // Inicializar datos vacíos para despliegue (sin datos de prueba)
+        function inicializarDatos() {
+            // Dejar estructuras en cero
+            mesasActivas = [];
+            productos = [];
+            ventas = [];
+
+            // Vaciar pendientes del módulo si existe
+            try {
+                localStorage.setItem('pendientes', JSON.stringify([]));
+                if (window.pendientesModule && typeof window.pendientesModule.load === 'function') {
+                    window.pendientesModule.load();
+                    if (typeof window.pendientesModule.setup === 'function') window.pendientesModule.setup();
+                }
+            } catch (e) {
+                console.warn('No se pudo limpiar pendientes en localStorage:', e);
+            }
+
+            // Guardar estructuras vacías en localStorage para despliegue limpio
+            guardarEnLocalStorage();
+        }
+        
+        // Configurar navegación por pestañas
+        function setupNavigation() {
+            const navLinks = document.querySelectorAll('.nav-tabs a');
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remover clase active de todos los enlaces
+                    navLinks.forEach(item => item.classList.remove('active'));
+                    
+                    // Agregar clase active al enlace clickeado
+                    this.classList.add('active');
+                    
+                    // Ocultar todas las pestañas
+                    const tabContents = document.querySelectorAll('.tab-content');
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    // Mostrar la pestaña correspondiente
+                    const targetTab = this.getAttribute('href');
+                    document.querySelector(targetTab).classList.add('active');
+                });
+            });
+        }
+        
+        // Función para abrir una pestaña específica desde otros lugares
+        function openTab(tabId) {
+            const navLinks = document.querySelectorAll('.nav-tabs a');
+            navLinks.forEach(item => item.classList.remove('active'));
+            
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            document.querySelector(`a[href="#${tabId}"]`).classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+        
+        // Configurar eventos de botones
+        function setupEventListeners() {
+            // Botón para iniciar mesa (cada jugador tiene su propio inicio)
+            document.getElementById('iniciar-mesa').addEventListener('click', function() {
+                const mesa = parseInt(document.getElementById('mesa-select').value);
+                const jugadores = parseInt(document.getElementById('jugadores-count').value);
+                const tarifa = parseFloat(document.getElementById('tarifa').value) || 0;
+
+                // Verificar si la mesa ya está activa
+                const mesaExistente = mesasActivas.find(m => m.mesa === mesa && m.activa);
+                if (mesaExistente) {
+                    alert(`La mesa ${mesa} ya está activa. Detenga el juego actual antes de iniciar uno nuevo.`);
+                    return;
+                }
+
+                // Agregar nueva mesa activa. Registrar inicio individual por jugador
+                const inicioAhora = new Date();
+                const players = [];
+                for (let i = 0; i < jugadores; i++) players.push({ start: inicioAhora });
+
+                const nuevaMesa = {
+                    id: Date.now(),
+                    mesa: mesa,
+                    jugadores: players.length,
+                    inicio: inicioAhora,
+                    tarifa: tarifa,
+                    players: players,
+                    activa: true
+                };
+
+                mesasActivas.push(nuevaMesa);
+                guardarEnLocalStorage();
+                cargarMesasActivas();
+
+                alert(`Juego iniciado en la Mesa ${mesa} con ${nuevaMesa.jugadores} jugadores. Tarifa: Q.${tarifa} por hora por jugador.`);
+            });
+            
+            // Botón para detener mesa
+            document.getElementById('detener-mesa').addEventListener('click', function() {
+                const mesa = parseInt(document.getElementById('mesa-select').value);
+                
+                // Buscar mesa activa
+                const mesaIndex = mesasActivas.findIndex(m => m.mesa === mesa && m.activa);
+                
+                if (mesaIndex === -1) {
+                    alert(`No hay juego activo en la Mesa ${mesa}.`);
+                    return;
+                }
+                
+                // Calcular tiempo y total
+                const mesaActiva = mesasActivas[mesaIndex];
+                const tiempoTranscurrido = (new Date() - mesaActiva.inicio) / (1000 * 60 * 60); // en horas
+                const total = tiempoTranscurrido * mesaActiva.tarifa * mesaActiva.jugadores;
+                
+                // Mostrar resumen
+                alert(`Juego finalizado en la Mesa ${mesa}.\nTiempo: ${tiempoTranscurrido.toFixed(2)} horas\nJugadores: ${mesaActiva.jugadores}\nTotal a pagar: Q.${total.toFixed(2)}`);
+                
+                // Desactivar mesa
+                mesasActivas[mesaIndex].activa = false;
+                guardarEnLocalStorage();
+                cargarMesasActivas();
+            });
+            
+            // Botón para registrar venta
+            document.getElementById('registrar-venta').addEventListener('click', function() {
+                const productoSelect = document.getElementById('producto-select');
+                const productoId = parseInt(productoSelect.value);
+                const cantidad = parseInt(document.getElementById('cantidad').value);
+                
+                if (!productoId || cantidad < 1) {
+                    alert('Por favor, seleccione un producto y una cantidad válida.');
+                    return;
+                }
+                
+                // Buscar producto en inventario
+                const producto = productos.find(p => p.id === productoId);
+                
+                if (!producto) {
+                    alert('Producto no encontrado.');
+                    return;
+                }
+                
+                // Verificar stock disponible
+                if (producto.stock < cantidad) {
+                    alert(`Stock insuficiente. Solo hay ${producto.stock} unidades disponibles.`);
+                    return;
+                }
+                
+                // Calcular total y ganancia
+                const total = cantidad * producto.precio;
+                const ganancia = cantidad * (producto.precio - producto.costo);
+                
+                // Registrar venta
+                const nuevaVenta = {
+                    id: Date.now(),
+                    producto: producto.nombre,
+                    cantidad: cantidad,
+                    precio: producto.precio,
+                    total: total,
+                    ganancia: ganancia,
+                    hora: new Date()
+                };
+                
+                ventas.push(nuevaVenta);
+                
+                // Actualizar stock
+                producto.stock -= cantidad;
+                
+                guardarEnLocalStorage();
+                cargarInventario();
+                actualizarVentasHistorial();
+                
+                alert(`Venta registrada: ${cantidad} x ${producto.nombre}\nTotal: Q.${total.toFixed(2)}\nGanancia: Q.${ganancia.toFixed(2)}`);
+                
+                // Limpiar formulario
+                document.getElementById('cantidad').value = 1;
+                document.getElementById('total-venta').value = '';
+                document.getElementById('ganancia').value = '';
+            });
+            
+            // Botón para agregar producto
+            document.getElementById('agregar-producto').addEventListener('click', function() {
+                const nombre = document.getElementById('producto-nombre').value.trim();
+                const categoria = document.getElementById('categoria').value;
+                const costo = parseFloat(document.getElementById('costo-compra').value);
+                const precio = parseFloat(document.getElementById('precio-venta-inv').value);
+                const stock = parseInt(document.getElementById('stock').value);
+                const stockMinimo = parseInt(document.getElementById('stock-minimo').value);
+                
+                if (!nombre || isNaN(costo) || isNaN(precio) || isNaN(stock) || isNaN(stockMinimo)) {
+                    alert('Por favor, complete todos los campos correctamente.');
+                    return;
+                }
+                
+                if (costo >= precio) {
+                    alert('El precio de venta debe ser mayor al costo de compra.');
+                    return;
+                }
+                
+                // Crear nuevo producto
+                const nuevoProducto = {
+                    id: Date.now(),
+                    nombre: nombre,
+                    categoria: categoria,
+                    costo: costo,
+                    precio: precio,
+                    stock: stock,
+                    stockMinimo: stockMinimo
+                };
+                
+                productos.push(nuevoProducto);
+                guardarEnLocalStorage();
+                cargarInventario();
+                cargarProductosSelect();
+                
+                alert(`Producto "${nombre}" agregado al inventario.`);
+                
+                // Limpiar formulario
+                document.getElementById('producto-nombre').value = '';
+                document.getElementById('costo-compra').value = '';
+                document.getElementById('precio-venta-inv').value = '';
+                document.getElementById('stock').value = '';
+            });
+            
+            // Botón para sincronizar con la nube
+            document.getElementById('sincronizar-nube').addEventListener('click', function() {
+                // Simular sincronización
+                const boton = this;
+                const textoOriginal = boton.innerHTML;
+                
+                boton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sincronizando...';
+                boton.disabled = true;
+                
+                setTimeout(() => {
+                    boton.innerHTML = textoOriginal;
+                    boton.disabled = false;
+                    
+                    // Simular éxito o error aleatorio
+                    if (Math.random() > 0.2) {
+                        alert('Sincronización completada con éxito. Todos los datos han sido respaldados en la nube.');
+                    } else {
+                        alert('Error en la sincronización. Verifique su conexión a Internet e intente nuevamente.');
+                    }
+                }, 2000);
+            });
+            
+            // Evento para actualizar total y ganancia cuando cambia producto o cantidad
+            document.getElementById('producto-select').addEventListener('change', actualizarTotalVenta);
+            document.getElementById('cantidad').addEventListener('input', actualizarTotalVenta);
+        }
+        
+        // Actualizar total y ganancia en formulario de ventas
+        function actualizarTotalVenta() {
+            const productoId = parseInt(document.getElementById('producto-select').value);
+            const cantidad = parseInt(document.getElementById('cantidad').value) || 0;
+            
+            if (productoId && cantidad > 0) {
+                const producto = productos.find(p => p.id === productoId);
+                
+                if (producto) {
+                    const total = cantidad * producto.precio;
+                    const ganancia = cantidad * (producto.precio - producto.costo);
+                    
+                    document.getElementById('precio-venta').value = producto.precio.toFixed(2);
+                    document.getElementById('total-venta').value = total.toFixed(2);
+                    document.getElementById('ganancia').value = ganancia.toFixed(2);
+                }
+            } else {
+                document.getElementById('precio-venta').value = '';
+                document.getElementById('total-venta').value = '';
+                document.getElementById('ganancia').value = '';
+            }
+        }
+        
+        // Cargar mesas activas en la tabla (calcula tiempo por jugador)
+        function cargarMesasActivas() {
+            const tbody = document.getElementById('mesas-table-body');
+            tbody.innerHTML = '';
+
+            mesasActivas.forEach(mesa => {
+                if (!mesa.activa) return;
+
+                const ahora = new Date();
+                let total = 0;
+                let maxMinutes = 0;
+
+                if (Array.isArray(mesa.players) && mesa.players.length) {
+                    mesa.players.forEach(p => {
+                        const inicio = new Date(p.start);
+                        const minutes = (ahora - inicio) / (1000 * 60);
+                        if (minutes > maxMinutes) maxMinutes = minutes;
+                        total += (minutes / 60) * (mesa.tarifa || 0);
+                    });
+                } else {
+                    // fallback al comportamiento anterior
+                    const minutes = (ahora - (mesa.inicio || ahora)) / (1000 * 60);
+                    maxMinutes = minutes;
+                    total = (minutes / 60) * (mesa.tarifa || 0) * (mesa.jugadores || 1);
+                }
+
+                const horas = Math.floor(maxMinutes / 60);
+                const minutos = Math.floor(maxMinutes % 60);
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>Mesa ${mesa.mesa}</td>
+                    <td><span class="status-active">Activa</span></td>
+                    <td>${mesa.players ? mesa.players.length : mesa.jugadores} jugadores</td>
+                    <td>${horas}h ${minutos}m</td>
+                    <td>Q. ${mesa.tarifa ? mesa.tarifa.toFixed(2) : '0.00'}</td>
+                    <td>Q. ${total.toFixed(2)}</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm btn-table-action" type="button" onclick="finalizarMesa(${mesa.id})">
+                            <i class="fas fa-stop"></i> Finalizar
+                        </button>
+                        <button class="btn btn-primary btn-sm" onclick="agregarJugador(${mesa.id})" style="padding: 5px 10px; font-size: 0.9rem; margin-left: 5px;">
+                            <i class="fas fa-user-plus"></i> +
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        // Cargar inventario en la tabla
+        function cargarInventario() {
+            const tbody = document.getElementById('inventario-body');
+            tbody.innerHTML = '';
+            
+            productos.forEach(producto => {
+                const gananciaUnitaria = producto.precio - producto.costo;
+                const estado = producto.stock <= producto.stockMinimo ? 
+                    `<span class="status-inactive">Bajo Stock</span>` : 
+                    `<span class="status-active">Disponible</span>`;
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${producto.nombre}</td>
+                    <td>${producto.categoria}</td>
+                    <td>${producto.stock}</td>
+                    <td>${producto.stockMinimo}</td>
+                    <td>Q. ${producto.costo.toFixed(2)}</td>
+                    <td>Q. ${producto.precio.toFixed(2)}</td>
+                    <td class="text-success">Q. ${gananciaUnitaria.toFixed(2)}</td>
+                    <td>${estado}</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" onclick="editarProducto(${producto.id})" style="padding: 5px 10px; font-size: 0.9rem;">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="eliminarProducto(${producto.id})" style="padding: 5px 10px; font-size: 0.9rem; margin-left: 5px;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        // Cargar productos en el select de ventas
+        function cargarProductosSelect() {
+            const select = document.getElementById('producto-select');
+            select.innerHTML = '<option value="">Seleccione un producto</option>';
+            
+            productos.forEach(producto => {
+                const option = document.createElement('option');
+                option.value = producto.id;
+                option.textContent = `${producto.nombre} - Q.${producto.precio.toFixed(2)} (Stock: ${producto.stock})`;
+                select.appendChild(option);
+            });
+        }
+        
+        // Actualizar historial de ventas
+        function actualizarVentasHistorial() {
+            const tbody = document.getElementById('ventas-historial-body');
+            tbody.innerHTML = '';
+            
+            // Mostrar solo ventas de hoy
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+            
+            const ventasHoy = ventas.filter(v => new Date(v.hora) >= hoy);
+            
+            ventasHoy.forEach(venta => {
+                const hora = new Date(venta.hora).toLocaleTimeString('es-GT', { hour: '2-digit', minute: '2-digit' });
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${venta.producto}</td>
+                    <td>${venta.cantidad}</td>
+                    <td>Q. ${venta.precio.toFixed(2)}</td>
+                    <td>Q. ${venta.total.toFixed(2)}</td>
+                    <td class="text-success">Q. ${venta.ganancia.toFixed(2)}</td>
+                    <td>${hora}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        // Funciones para acciones en mesas
+        function finalizarMesa(id) {
+            const mesaIndex = mesasActivas.findIndex(m => m.id === id);
+
+            if (mesaIndex !== -1) {
+                const mesa = mesasActivas[mesaIndex];
+                const ahora = new Date();
+                let total = 0;
+                let detalles = [];
+
+                if (Array.isArray(mesa.players) && mesa.players.length) {
+                    mesa.players.forEach((p, idx) => {
+                        const inicioJugador = new Date(p.start);
+                        const horas = (ahora - inicioJugador) / (1000 * 60 * 60);
+                        const monto = horas * (mesa.tarifa || 0);
+                        total += monto;
+                        detalles.push(`Jugador ${idx + 1}: ${horas.toFixed(2)}h -> Q.${monto.toFixed(2)}`);
+                    });
+                } else {
+                    const horas = (ahora - (mesa.inicio || ahora)) / (1000 * 60 * 60);
+                    total = horas * (mesa.tarifa || 0) * (mesa.jugadores || 1);
+                    detalles.push(`Todos: ${horas.toFixed(2)}h`);
+                }
+
+                alert(`Mesa ${mesa.mesa} finalizada.\n${detalles.join('\n')}\nTotal a cobrar: Q.${total.toFixed(2)}`);
+
+                // Desactivar mesa
+                mesasActivas[mesaIndex].activa = false;
+                guardarEnLocalStorage();
+                cargarMesasActivas();
+            }
+        }
+        
+        function agregarJugador(id) {
+            const mesaIndex = mesasActivas.findIndex(m => m.id === id);
+
+            if (mesaIndex !== -1) {
+                const inicioJugador = new Date();
+                if (!Array.isArray(mesasActivas[mesaIndex].players)) mesasActivas[mesaIndex].players = [];
+                mesasActivas[mesaIndex].players.push({ start: inicioJugador });
+                mesasActivas[mesaIndex].jugadores = mesasActivas[mesaIndex].players.length;
+                guardarEnLocalStorage();
+                cargarMesasActivas();
+
+                alert(`Se agregó un jugador a la Mesa ${mesasActivas[mesaIndex].mesa}. Nuevo jugador iniciado ahora.`);
+            }
+        }
+        
+        // Funciones para acciones en inventario
+        function editarProducto(id) {
+            const producto = productos.find(p => p.id === id);
+            
+            if (producto) {
+                document.getElementById('producto-nombre').value = producto.nombre;
+                document.getElementById('categoria').value = producto.categoria;
+                document.getElementById('costo-compra').value = producto.costo;
+                document.getElementById('precio-venta-inv').value = producto.precio;
+                document.getElementById('stock').value = producto.stock;
+                document.getElementById('stock-minimo').value = producto.stockMinimo;
+                
+                // Desplazarse al formulario de inventario
+                openTab('inventario');
+            }
+        }
+        
+        function eliminarProducto(id) {
+            if (confirm('¿Está seguro de eliminar este producto? Esta acción no se puede deshacer.')) {
+                productos = productos.filter(p => p.id !== id);
+                guardarEnLocalStorage();
+                cargarInventario();
+                cargarProductosSelect();
+            }
+        }
+        
+        // Guardar datos en localStorage
+        function guardarEnLocalStorage() {
+            localStorage.setItem('mesasActivas', JSON.stringify(mesasActivas));
+            localStorage.setItem('productos', JSON.stringify(productos));
+            localStorage.setItem('ventas', JSON.stringify(ventas));
+        }
+        
+        // Cargar datos desde localStorage (reconstruir fechas de players)
+        function cargarDesdeLocalStorage() {
+            const mesasGuardadas = localStorage.getItem('mesasActivas');
+            const productosGuardados = localStorage.getItem('productos');
+            const ventasGuardadas = localStorage.getItem('ventas');
+
+            if (mesasGuardadas) {
+                try {
+                    mesasActivas = JSON.parse(mesasGuardadas);
+                    // convertir strings a Date en players y en inicio
+                    mesasActivas.forEach(m => {
+                        if (m.inicio) m.inicio = new Date(m.inicio);
+                        if (Array.isArray(m.players)) {
+                            m.players = m.players.map(p => ({ start: new Date(p.start) }));
+                        }
+                    });
+                } catch (e) {
+                    console.warn('Error parseando mesasActivas desde localStorage', e);
+                    mesasActivas = [];
+                }
+            }
+            if (productosGuardados) productos = JSON.parse(productosGuardados);
+            if (ventasGuardadas) ventas = JSON.parse(ventasGuardadas);
+        }
+        
+        // Inicializar gráficos
+        function inicializarGraficos() {
+            // Gráfico de ingresos por mesas
+            const incomeCtx = document.getElementById('incomeChart').getContext('2d');
+            new Chart(incomeCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+                    datasets: [{
+                        label: 'Ingresos por Mesas (Q.)',
+                        data: [0, 0, 0, 0, 0, 0, 0],
+                        backgroundColor: 'rgba(52, 152, 219, 0.7)',
+                        borderColor: 'rgba(52, 152, 219, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return 'Q. ' + value;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Gráfico de ventas por categoría
+            const salesCtx = document.getElementById('salesChart').getContext('2d');
+            new Chart(salesCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Bebidas', 'Snacks', 'Dulces', 'Otros'],
+                    datasets: [{
+                        data: [0, 0, 0, 0],
+                        backgroundColor: [
+                            'rgba(52, 152, 219, 0.7)',
+                            'rgba(46, 204, 113, 0.7)',
+                            'rgba(155, 89, 182, 0.7)',
+                            'rgba(241, 196, 15, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(52, 152, 219, 1)',
+                            'rgba(46, 204, 113, 1)',
+                            'rgba(155, 89, 182, 1)',
+                            'rgba(241, 196, 15, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    }
+                }
+            });
+            
+            // Gráfico de meta vs real
+            const goalCtx = document.getElementById('goalChart').getContext('2d');
+            new Chart(goalCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4'],
+                    datasets: [
+                        {
+                            label: 'Meta (Q.)',
+                            data: [0, 0, 0, 0],
+                            borderColor: 'rgba(231, 76, 60, 1)',
+                            backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                            borderWidth: 2,
+                            borderDash: [5, 5]
+                        },
+                        {
+                            label: 'Real (Q.)',
+                            data: [0, 0, 0, 0],
+                            borderColor: 'rgba(46, 204, 113, 1)',
+                            backgroundColor: 'rgba(46, 204, 113, 0.1)',
+                            borderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return 'Q. ' + value;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Gráfico de productos más vendidos
+            const topProductsCtx = document.getElementById('topProductsChart').getContext('2d');
+            new Chart(topProductsCtx, {
+                type: 'horizontalBar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Unidades Vendidas',
+                        data: [0, 0, 0, 0, 0],
+                        backgroundColor: 'rgba(241, 196, 15, 0.7)',
+                        borderColor: 'rgba(241, 196, 15, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(() => console.log('Service Worker registrado'))
+                .catch(err => console.warn('Service Worker fallo:', err));
+        }
+    </script>
+    <script>
+    // Verificar si Font Awesome cargó; si no, reemplazar íconos <i> por imágenes locales
+    (function(){
+        function faLoaded(){
+            try{
+                const test = document.createElement('i');
+                test.className = 'fas fa-check';
+                test.style.display = 'none';
+                document.body.appendChild(test);
+                const content = window.getComputedStyle(test, '::before').content;
+                document.body.removeChild(test);
+                return content && content !== 'none' && content !== '""' && content !== '""';
+            }catch(e){return false;}
+        }
+
+        function replaceIcons(){
+            const selector = '.logo i, .nav-tabs i, button i, .card-title i, .btn i, .form-container i';
+            const icons = Array.from(document.querySelectorAll(selector));
+            icons.forEach(i => {
+                // skip if already replaced
+                if (i.tagName.toLowerCase() !== 'i') return;
+                const img = document.createElement('img');
+                // header logo replacement
+                if (i.closest('.logo') || i.closest('.logo-container')) {
+                    img.src = 'header-logo.png';
+                    img.className = 'local-header-logo';
+                } else {
+                    img.src = 'icon-192.png';
+                    img.className = 'local-icon';
+                }
+                img.alt = 'icon';
+                i.replaceWith(img);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function(){ if(!faLoaded()) replaceIcons(); });
+    })();
+    </script>
+</body>
+</html>
