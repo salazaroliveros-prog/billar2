@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install dependencies
+        run: npm ci
+      - name: Run jsdom tests
+        run: npm test
+      - name: Run Puppeteer tests
+        env:
+          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: false
+        run: npm run test:puppeteer
