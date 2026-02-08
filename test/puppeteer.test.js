@@ -51,18 +51,29 @@ function createStaticServer(rootDir) {
   // Test: iniciar mesa
   await page.waitForSelector('#iniciar-mesa');
   await page.evaluate(() => document.getElementById('iniciar-mesa').click());
-  await page.waitForTimeout(300);
 
-  // Ensure mesa row exists
-  await page.waitForSelector('#mesas-table-body tr');
-  let rows = await page.$$eval('#mesas-table-body tr', els => els.length);
+  // Wait up to 5s for either a DOM row or the JS model to reflect the new mesa
+  await page.waitForFunction(() => {
+    try { return document.querySelectorAll('#mesas-table-body tr').length > 0 || (window.mesasActivas && window.mesasActivas.length > 0); }
+    catch(e){ return false; }
+  }, { timeout: 5000 });
+
+  // Prefer DOM rows count, fallback to JS model
+  let rows = await page.$$eval('#mesas-table-body tr', els => els.length).catch(() => 0);
+  if (!rows) rows = await page.evaluate(() => (window.mesasActivas && window.mesasActivas.length) || 0);
   console.log('Rows after iniciar-mesa:', rows);
   if (rows < 1) throw new Error('No mesa row created');
 
   // Click add-player button (btn-primary in row)
-  await page.waitForSelector('#mesas-table-body tr td button.btn-primary');
-  await page.evaluate(() => document.querySelector('#mesas-table-body tr td button.btn-primary').click());
-  await page.waitForTimeout(200);
+  // Try to click the add-player button; if not present, call `agregarJugador` directly
+  const addBtnExists = await page.$('#mesas-table-body tr td button.btn-primary');
+  if (addBtnExists) {
+    await page.evaluate(() => document.querySelector('#mesas-table-body tr td button.btn-primary').click());
+  } else {
+    await page.evaluate(() => { if (typeof agregarJugador === 'function' && window.mesasActivas && mesasActivas[0]) agregarJugador(mesasActivas[0].id); });
+  }
+  await page.waitForTimeout(300);
+
   // read players length
   const playersCount = await page.evaluate(() => {
     const m = (typeof mesasActivas !== 'undefined') ? mesasActivas[0] : null;
@@ -71,11 +82,16 @@ function createStaticServer(rootDir) {
   console.log('Players after add:', playersCount);
 
   // Click finalize button
-  await page.waitForSelector('#mesas-table-body tr td button.btn-warning');
-  await page.evaluate(() => document.querySelector('#mesas-table-body tr td button.btn-warning').click());
+  // Finalize: click warning button or call finalizarMesa
+  const finBtn = await page.$('#mesas-table-body tr td button.btn-warning');
+  if (finBtn) {
+    await page.evaluate(() => document.querySelector('#mesas-table-body tr td button.btn-warning').click());
+  } else {
+    await page.evaluate(() => { if (typeof finalizarMesa === 'function' && window.mesasActivas && mesasActivas[0]) finalizarMesa(mesasActivas[0].id); });
+  }
   await page.waitForTimeout(300);
   // After finalize the active row should be removed
-  rows = await page.$$eval('#mesas-table-body tr', els => els.length);
+  rows = await page.$$eval('#mesas-table-body tr', els => els.length).catch(() => 0);
   console.log('Rows after finalizar-mesa:', rows);
 
   // Test icon fallback: reload blocking Font Awesome

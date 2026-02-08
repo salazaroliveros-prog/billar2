@@ -1,6 +1,3 @@
-Debugger listening on ws://127.0.0.1:63663/2c8821eb-e630-44a0-a398-dd1d1fcd425e
-For help, see: https://nodejs.org/en/docs/inspector
-Debugger attached.
 [1m[43m[30m
   Puppeteer old Headless deprecation warning:[0m[33m
     In the near feature `headless: true` will default to the new Headless mode
@@ -9,9 +6,8 @@ Debugger attached.
     Consider opting in early by passing `headless: "new"` to `puppeteer.launch()`
     If you encounter any bugs, please report them to https://github.com/puppeteer/puppeteer/issues/new/choose.[0m
 
-Opening http://localhost:63665/
+Opening http://localhost:63522/
 productos length after add: 0
 Puppeteer handlers test failed: Error: Producto no agregado
     at C:\Users\wilso\OneDrive\Documents\APPS\App_finanzas_Billar_2026\test\puppeteer.handlers.test.js:57:28
     at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
-Waiting for the debugger to disconnect...

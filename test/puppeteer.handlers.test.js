@@ -49,7 +49,15 @@ function createStaticServer(rootDir) {
   });
   await page.waitForSelector('#agregar-producto');
   await page.evaluate(() => document.getElementById('agregar-producto').click());
-  await page.waitForTimeout(200);
+
+  // Wait for product to be added to the JS model (or retry click)
+  try {
+    await page.waitForFunction(() => window.productos && window.productos.length > 0, { timeout: 5000 });
+  } catch (e) {
+    // retry click once
+    await page.evaluate(() => document.getElementById('agregar-producto').click());
+    await page.waitForFunction(() => window.productos && window.productos.length > 0, { timeout: 3000 });
+  }
 
   // Verify product added
   const prodCount = await page.evaluate(() => productos.length);

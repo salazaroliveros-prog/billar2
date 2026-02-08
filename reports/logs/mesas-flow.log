@@ -1,6 +1,3 @@
-Debugger listening on ws://127.0.0.1:63677/375870e2-636b-4ca6-a6fa-86dab565ecf0
-For help, see: https://nodejs.org/en/docs/inspector
-Debugger attached.
 [1m[43m[30m
   Puppeteer old Headless deprecation warning:[0m[33m
     In the near feature `headless: true` will default to the new Headless mode
@@ -9,9 +6,8 @@ Debugger attached.
     Consider opting in early by passing `headless: "new"` to `puppeteer.launch()`
     If you encounter any bugs, please report them to https://github.com/puppeteer/puppeteer/issues/new/choose.[0m
 
-Opening http://localhost:63680/
-producto option value: 1770546347667
+Opening http://localhost:61655/
+producto option value: 1770548860184
 mesasActivas active count: 1
 ventasContain: true
 Mesas flow puppeteer test passed
-Waiting for the debugger to disconnect...
