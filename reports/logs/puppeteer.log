@@ -1,0 +1,20 @@
+Debugger listening on ws://127.0.0.1:56409/731eaf30-7b18-4c0c-ba13-11842aae4ae3
+For help, see: https://nodejs.org/en/docs/inspector
+Debugger attached.
+[1m[43m[30m
+  Puppeteer old Headless deprecation warning:[0m[33m
+    In the near feature `headless: true` will default to the new Headless mode
+    for Chrome instead of the old Headless implementation. For more
+    information, please see https://developer.chrome.com/articles/new-headless/.
+    Consider opting in early by passing `headless: "new"` to `puppeteer.launch()`
+    If you encounter any bugs, please report them to https://github.com/puppeteer/puppeteer/issues/new/choose.[0m
+
+Opening http://localhost:56411/
+page readyState= interactive
+iniciar-mesa present on page? true
+body length: 46738
+Puppeteer test failed: TimeoutError: Waiting for selector `#mesas-table-body tr` failed: Waiting failed: 30000ms exceeded
+    at Timeout.<anonymous> (C:\Users\wilso\OneDrive\Documents\APPS\App_finanzas_Billar_2026\node_modules\puppeteer-core\lib\cjs\puppeteer\common\WaitTask.js:71:32)
+    at listOnTimeout (node:internal/timers:605:17)
+    at process.processTimers (node:internal/timers:541:7)
+Waiting for the debugger to disconnect...

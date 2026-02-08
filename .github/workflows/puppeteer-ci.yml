@@ -1,0 +1,71 @@
+name: Puppeteer CI
+
+on:
+  pull_request:
+    branches: [ '**' ]
+  push:
+    branches: [ 'main', 'master' ]
+
+jobs:
+  puppeteer-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - name: puppeteer
+            command: npm run test:puppeteer
+          - name: handlers
+            command: npm run test:puppeteer:handlers
+          - name: mesas-flow
+            command: npm run test:puppeteer:mesas-flow
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Cache npm and puppeteer
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+            ~/.cache/puppeteer
+            ~/.local-chromium
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json', 'package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests (Mocha wrapper)
+        run: |
+          mkdir -p reports logs
+          npm run test:mocha 2>&1 | tee reports/logs/mocha-all.log
+          echo "mocha-exit=$?" > reports/logs/mocha-all.rc
+
+      - name: Upload logs and reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: puppeteer-reports
+          path: |
+            reports/**
+
+      - name: Slack notification (optional)
+        if: ${{ secrets.SLACK_WEBHOOK != '' }}
+        run: |
+          set -e
+          WEBHOOK="${{ secrets.SLACK_WEBHOOK }}"
+          STATUS="SUCCESS"
+          if [ -f reports/logs/mocha-all.rc ]; then
+            RC=$(cat reports/logs/mocha-all.rc | sed 's/[^0-9]//g')
+            if [ "$RC" != "0" ]; then STATUS="FAILED"; fi
+          fi
+          RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          PAYLOAD=$(jq -nc --arg status "$STATUS" --arg repo "$GITHUB_REPOSITORY" --arg ref "$GITHUB_REF" --arg run_url "$RUN_URL" '{blocks:[{type:"section",text:{type:"mrkdwn",text:("*Puppeteer CI:* *"+$status+"* — `"+$repo+"` on "+$ref)}},{type:"section",text:{type:"mrkdwn",text:("<"+$run_url+"|View workflow run>")}}]}')
+          curl -s -X POST -H 'Content-type: application/json' --data "$PAYLOAD" $WEBHOOK
