@@ -6,8 +6,11 @@
     Consider opting in early by passing `headless: "new"` to `puppeteer.launch()`
     If you encounter any bugs, please report them to https://github.com/puppeteer/puppeteer/issues/new/choose.[0m
 
-Opening http://localhost:63522/
-productos length after add: 0
-Puppeteer handlers test failed: Error: Producto no agregado
-    at C:\Users\wilso\OneDrive\Documents\APPS\App_finanzas_Billar_2026\test\puppeteer.handlers.test.js:57:28
-    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+Opening http://localhost:55997/
+productos length after add: 2
+updatedName: Prod_TempUpdated
+proyeccion text: Ventas necesarias: Q. 10000.00
+lastExported after generar-reporte: reporte-ventas
+lastExported after exportar-excel: inventario-csv
+lastExported after exportar-pdf: inventario-pdf-sim
+Handlers puppeteer tests passed

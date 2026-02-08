@@ -6,11 +6,12 @@
     Consider opting in early by passing `headless: "new"` to `puppeteer.launch()`
     If you encounter any bugs, please report them to https://github.com/puppeteer/puppeteer/issues/new/choose.[0m
 
-Opening http://localhost:57186/
-page readyState= interactive
+Opening http://localhost:55988/
+page readyState= complete
 iniciar-mesa present on page? true
-body length: 46738
-Puppeteer test failed: TimeoutError: Waiting for selector `#mesas-table-body tr` failed: Waiting failed: 30000ms exceeded
-    at Timeout.<anonymous> (C:\Users\wilso\OneDrive\Documents\APPS\App_finanzas_Billar_2026\node_modules\puppeteer-core\lib\cjs\puppeteer\common\WaitTask.js:71:32)
-    at listOnTimeout (node:internal/timers:605:17)
-    at process.processTimers (node:internal/timers:541:7)
+body length: 46636
+Rows after iniciar-mesa: 1
+Players after add: 2
+Rows after finalizar-mesa: 0
+Local icons present: 43
+Puppeteer tests passed
