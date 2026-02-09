@@ -1472,7 +1472,22 @@
                         document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
                         const target = document.getElementById(tabId);
                         if (target) target.classList.add('active');
-                    } catch (e) { /* ignore */ }
+                    } catch (e) { console.warn('openTab shim error', e); }
+                };
+            }
+            // Minimal notify fallback so headless tests / early code won't fail
+            if (!window.notify) {
+                window.notify = function(message, type = 'info', timeout = 2500) {
+                    try {
+                        const existing = document.querySelector('.notify');
+                        if (existing) existing.remove();
+                        const n = document.createElement('div');
+                        n.className = 'notify' + (type === 'success' ? ' notify-success' : type === 'error' ? ' notify-error' : type === 'warning' ? ' notify-warning' : '');
+                        n.textContent = message || '';
+                        document.body.appendChild(n);
+                        requestAnimationFrame(() => n.classList.add('show'));
+                        setTimeout(() => { n.classList.remove('show'); setTimeout(() => n.remove(), 300); }, timeout);
+                    } catch (e) { try { console.log(message); } catch(_){} }
                 };
             }
         </script>
