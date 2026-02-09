@@ -6,12 +6,11 @@
     Consider opting in early by passing `headless: "new"` to `puppeteer.launch()`
     If you encounter any bugs, please report them to https://github.com/puppeteer/puppeteer/issues/new/choose.[0m
 
-Opening http://localhost:55988/
-page readyState= complete
+Opening http://localhost:59484/
+page readyState= interactive
 iniciar-mesa present on page? true
-body length: 46636
-Rows after iniciar-mesa: 1
-Players after add: 2
-Rows after finalizar-mesa: 0
-Local icons present: 43
-Puppeteer tests passed
+body length: 46817
+Puppeteer test failed: TimeoutError: Waiting failed: 5000ms exceeded
+    at Timeout.<anonymous> (C:\Users\wilso\OneDrive\Documents\APPS\App_finanzas_Billar_2026\node_modules\puppeteer-core\lib\cjs\puppeteer\common\WaitTask.js:71:32)
+    at listOnTimeout (node:internal/timers:605:17)
+    at process.processTimers (node:internal/timers:541:7)

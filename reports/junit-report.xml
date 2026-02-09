@@ -1,13 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="Mocha Tests" time="12.110" tests="3" failures="0">
-  <testsuite name="Root Suite" timestamp="2026-02-08T11:37:44" tests="0" time="0.000" failures="0">
+<testsuites name="Mocha Tests" time="23.992" tests="3" failures="2">
+  <testsuite name="Root Suite" timestamp="2026-02-08T12:05:29" tests="0" time="0.000" failures="0">
   </testsuite>
-  <testsuite name="Puppeteer scripts (wrapper)" timestamp="2026-02-08T11:37:44" tests="3" file="C:\Users\wilso\OneDrive\Documents\APPS\App_finanzas_Billar_2026\test\mocha-wrapper.spec.js" time="12.110" failures="0">
-    <testcase name="Puppeteer scripts (wrapper) should run puppeteer.test.js" time="5.192" classname="should run puppeteer.test.js">
+  <testsuite name="Puppeteer scripts (wrapper)" timestamp="2026-02-08T12:05:29" tests="3" file="C:\Users\wilso\OneDrive\Documents\APPS\App_finanzas_Billar_2026\test\mocha-wrapper.spec.js" time="23.991" failures="2">
+    <testcase name="Puppeteer scripts (wrapper) should run puppeteer.test.js" time="8.017" classname="should run puppeteer.test.js">
+      <failure message="puppeteer.test.js failed (see C:\Users\wilso\OneDrive\Documents\APPS\App_finanzas_Billar_2026\reports\logs\puppeteer.log)
+
+2 !== 0
+" type="AssertionError"><![CDATA[AssertionError [ERR_ASSERTION]: puppeteer.test.js failed (see C:\Users\wilso\OneDrive\Documents\APPS\App_finanzas_Billar_2026\reports\logs\puppeteer.log)
+
+2 !== 0
+
+    at Context.<anonymous> (test\mocha-wrapper.spec.js:41:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+
+      + expected - actual
+
+      -2
+      +0
+      ]]></failure>
     </testcase>
-    <testcase name="Puppeteer scripts (wrapper) should run puppeteer.handlers.test.js" time="3.503" classname="should run puppeteer.handlers.test.js">
+    <testcase name="Puppeteer scripts (wrapper) should run puppeteer.handlers.test.js" time="13.663" classname="should run puppeteer.handlers.test.js">
+      <failure message="puppeteer.handlers.test.js failed (see C:\Users\wilso\OneDrive\Documents\APPS\App_finanzas_Billar_2026\reports\logs\handlers.log)
+
+2 !== 0
+" type="AssertionError"><![CDATA[AssertionError [ERR_ASSERTION]: puppeteer.handlers.test.js failed (see C:\Users\wilso\OneDrive\Documents\APPS\App_finanzas_Billar_2026\reports\logs\handlers.log)
+
+2 !== 0
+
+    at Context.<anonymous> (test\mocha-wrapper.spec.js:46:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+
+      + expected - actual
+
+      -2
+      +0
+      ]]></failure>
     </testcase>
-    <testcase name="Puppeteer scripts (wrapper) should run puppeteer.mesas.flow.test.js" time="3.412" classname="should run puppeteer.mesas.flow.test.js">
+    <testcase name="Puppeteer scripts (wrapper) should run puppeteer.mesas.flow.test.js" time="2.307" classname="should run puppeteer.mesas.flow.test.js">
     </testcase>
   </testsuite>
 </testsuites>

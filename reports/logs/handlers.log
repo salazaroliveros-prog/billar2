@@ -6,11 +6,8 @@
     Consider opting in early by passing `headless: "new"` to `puppeteer.launch()`
     If you encounter any bugs, please report them to https://github.com/puppeteer/puppeteer/issues/new/choose.[0m
 
-Opening http://localhost:55997/
-productos length after add: 2
-updatedName: Prod_TempUpdated
-proyeccion text: Ventas necesarias: Q. 10000.00
-lastExported after generar-reporte: reporte-ventas
-lastExported after exportar-excel: inventario-csv
-lastExported after exportar-pdf: inventario-pdf-sim
-Handlers puppeteer tests passed
+Opening http://localhost:56638/
+Puppeteer handlers test failed: TimeoutError: Waiting failed: 3000ms exceeded
+    at Timeout.<anonymous> (C:\Users\wilso\OneDrive\Documents\APPS\App_finanzas_Billar_2026\node_modules\puppeteer-core\lib\cjs\puppeteer\common\WaitTask.js:71:32)
+    at listOnTimeout (node:internal/timers:605:17)
+    at process.processTimers (node:internal/timers:541:7)

@@ -31,8 +31,10 @@ function createStaticServer(rootDir) {
   const browser = await puppeteer.launch({ args: ['--no-sandbox','--disable-setuid-sandbox'] });
   const page = await browser.newPage();
 
-  // Accept alerts automatically
+  // Accept alerts automatically and capture console/errors for debugging
   page.on('dialog', async dialog => { console.log('[dialog]', dialog.message()); await dialog.accept(); });
+  page.on('console', msg => { try { console.log('[page.console]', msg.text()); } catch(e){} });
+  page.on('pageerror', err => { console.error('[page.error]', err && err.stack ? err.stack : err); });
 
   // Intercept requests to force icon fallback test later
   await page.setRequestInterception(false);
@@ -52,11 +54,20 @@ function createStaticServer(rootDir) {
   await page.waitForSelector('#iniciar-mesa');
   await page.evaluate(() => document.getElementById('iniciar-mesa').click());
 
-  // Wait up to 5s for either a DOM row or the JS model to reflect the new mesa
-  await page.waitForFunction(() => {
-    try { return document.querySelectorAll('#mesas-table-body tr').length > 0 || (window.mesasActivas && window.mesasActivas.length > 0); }
-    catch(e){ return false; }
-  }, { timeout: 5000 });
+  // Wait up to 10s for either a DOM row or the JS model to reflect the new mesa
+  try {
+    await page.waitForFunction(() => {
+      try { return document.querySelectorAll('#mesas-table-body tr').length > 0 || (window.mesasActivas && window.mesasActivas.length > 0); }
+      catch(e){ return false; }
+    }, { timeout: 10000 });
+  } catch (e) {
+    console.error('waitForFunction for mesa creation failed:', e && e.message ? e.message : e);
+    const lastAction = await page.evaluate(() => window.__lastAction || null).catch(()=>null);
+    const lastError = await page.evaluate(() => window.__lastError || null).catch(()=>null);
+    const mesasSnapshot = await page.evaluate(() => JSON.stringify(window.mesasActivas || [])).catch(()=>null);
+    console.error('debug: __lastAction=', lastAction, ' __lastError=', lastError, ' mesas=', mesasSnapshot);
+    throw e;
+  }
 
   // Prefer DOM rows count, fallback to JS model
   let rows = await page.$$eval('#mesas-table-body tr', els => els.length).catch(() => 0);

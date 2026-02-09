@@ -93,50 +93,95 @@
             font-weight: bold;
         }
         
-        /* Navigation */
+        /* Navigation (interactive, professional) */
         nav {
             background-color: white;
             border-radius: 10px;
             margin-bottom: 25px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 6px 22px rgba(18, 38, 63, 0.06);
+            padding: 6px;
         }
-        
+
         .nav-tabs {
             display: flex;
             flex-wrap: wrap;
             list-style: none;
+            gap: 8px;
+            align-items: stretch;
         }
-        
+
         .nav-tabs li {
-            flex: 1;
+            flex: 1 1 120px;
             min-width: 120px;
         }
-        
+
         .nav-tabs li a {
-            display: block;
-            padding: 18px 15px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 14px;
             text-align: center;
             text-decoration: none;
             color: var(--primary-color);
-            font-weight: 600;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s ease;
+            font-weight: 700;
+            border-radius: 10px;
+            background: transparent;
+            position: relative;
+            overflow: visible;
+            transition: transform 180ms ease, box-shadow 180ms ease, color 180ms ease, background 180ms ease;
         }
-        
+
+        .nav-tabs li a::after {
+            content: '';
+            position: absolute;
+            left: 22%;
+            bottom: 8px;
+            height: 3px;
+            width: 56%;
+            background: var(--secondary-color);
+            border-radius: 3px;
+            transform: scaleX(0);
+            transform-origin: center;
+            transition: transform 220ms cubic-bezier(.2,.9,.2,1), opacity 180ms ease;
+            opacity: 0;
+            pointer-events: none;
+        }
+
         .nav-tabs li a:hover {
-            background-color: rgba(52, 152, 219, 0.1);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 24px rgba(52, 152, 219, 0.08);
             color: var(--secondary-color);
+            background: linear-gradient(180deg, rgba(52,152,219,0.03), rgba(52,152,219,0.01));
         }
-        
+
+        .nav-tabs li a:focus, .nav-tabs li a:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(52,152,219,0.08);
+        }
+
         .nav-tabs li a.active {
             color: var(--secondary-color);
-            border-bottom-color: var(--secondary-color);
-            background-color: rgba(52, 152, 219, 0.05);
+            transform: translateY(-2px);
+            background: linear-gradient(180deg, rgba(52,152,219,0.06), rgba(52,152,219,0.02));
+            box-shadow: 0 10px 24px rgba(52,152,219,0.06);
         }
-        
+
+        .nav-tabs li a.active::after {
+            transform: scaleX(1);
+            opacity: 1;
+            left: 12%;
+            width: 76%;
+        }
+
         .nav-tabs li a i {
             margin-right: 8px;
+            font-size: 1.05rem;
+            transition: transform 220ms ease, color 180ms ease;
+            display: inline-block;
         }
+
+        .nav-tabs li a:hover i { transform: translateY(-2px) rotate(-6deg); color: var(--secondary-color); }
         
         /* Main Content */
         .tab-content {
@@ -439,6 +484,12 @@
             padding: 5px 10px;
             font-size: 0.9rem;
         }
+        /* Notifications */
+        .notify { position: fixed; right: 20px; bottom: 20px; background: #2c3e50; color: #fff; padding: 10px 14px; border-radius: 8px; box-shadow: 0 6px 18px rgba(0,0,0,0.12); opacity: 0; transform: translateY(8px); transition: all 220ms ease; z-index: 9999; pointer-events: auto; margin-top: 6px; }
+        .notify.show { opacity: 1; transform: translateY(0); }
+        .notify-success { background: #27ae60; }
+        .notify-error { background: #e74c3c; }
+        .notify-warning { background: #f39c12; }
     </style>
 </head>
 <body>
@@ -1410,6 +1461,21 @@
         </div>
     </div>
 
-    <script type="module" src="/src/main.js"></script>
+        <script>
+            // Immediate shim so inline onclicks don't fail before module loads
+            if (!window.openTab) {
+                window.openTab = function(tabId) {
+                    try {
+                        document.querySelectorAll('.nav-tabs a').forEach(item => item.classList.remove('active'));
+                        const link = document.querySelector('.nav-tabs a[href="#' + tabId + '"]');
+                        if (link) link.classList.add('active');
+                        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                        const target = document.getElementById(tabId);
+                        if (target) target.classList.add('active');
+                    } catch (e) { /* ignore */ }
+                };
+            }
+        </script>
+        <script type="module" src="./src/main.js"></script>
 </body>
 </html>

@@ -2,8 +2,10 @@
   "name": "M&S Control Finanzas App",
   "short_name": "M&S Finanzas",
   "description": "Aplicación de control financiero para mesas y ventas",
-  "start_url": "./index.html",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
+  "orientation": "any",
   "background_color": "#ffffff",
   "theme_color": "#2c3e50",
   "icons": [

@@ -28,6 +28,8 @@ function createStaticServer(rootDir) {
   const browser = await puppeteer.launch({ args: ['--no-sandbox','--disable-setuid-sandbox'] });
   const page = await browser.newPage();
   page.on('dialog', async dialog => { console.log('[dialog]', dialog.message()); await dialog.accept(); });
+  page.on('console', msg => { try { console.log('[page.console]', msg.text()); } catch(e){} });
+  page.on('pageerror', err => { console.error('[page.error]', err && err.stack ? err.stack : err); });
 
   console.log('Opening', url);
   await page.goto(url, { waitUntil: 'networkidle2' });
@@ -52,11 +54,16 @@ function createStaticServer(rootDir) {
 
   // Wait for product to be added to the JS model (or retry click)
   try {
-    await page.waitForFunction(() => window.productos && window.productos.length > 0, { timeout: 5000 });
+    await page.waitForFunction(() => window.productos && window.productos.length > 0, { timeout: 8000 });
   } catch (e) {
+    console.error('First waitForFunction failed:', e && e.message ? e.message : e);
+    const lastAction = await page.evaluate(() => window.__lastAction || null);
+    const lastError = await page.evaluate(() => window.__lastError || null);
+    const productosSnapshot = await page.evaluate(() => JSON.stringify(window.productos || []));
+    console.error('debug: __lastAction=', lastAction, ' __lastError=', lastError, ' productos=', productosSnapshot);
     // retry click once
     await page.evaluate(() => document.getElementById('agregar-producto').click());
-    await page.waitForFunction(() => window.productos && window.productos.length > 0, { timeout: 3000 });
+    await page.waitForFunction(() => window.productos && window.productos.length > 0, { timeout: 7000 });
   }
 
   // Verify product added
